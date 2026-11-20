@@ -434,6 +434,11 @@ export function synthesize(persona: PersonaSpec, seed: number, opts: { days?: nu
       t = runWorkflow(c, t, wf);
       occurrences.get(wf.id)!.push({ start: new Date(s).toISOString(), end: new Date(Math.round(t)).toISOString() });
     }
+    if (!paused) {
+      push(c, t, { kind: 'capture_state', state: 'paused', reason: 'user' });
+      t += 30 * 60_000;
+      push(c, t, { kind: 'capture_state', state: 'resumed', reason: null });
+    }
     while (t < dayEnd) t = noise(c, t, 25 * 60);
     push(c, t, { kind: 'idle_start', idleThresholdSeconds: 120 });
     push(c, t + 1000, { kind: 'capture_state', state: 'stopped', reason: 'end of day' });

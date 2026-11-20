@@ -9,7 +9,16 @@ import { clamp01, r1, sha256Hex, toMs } from './util.js';
 /** Verbs that only consume information. A path made only of these has nothing to automate. */
 const PASSIVE = new Set(['read', 'navigate', 'unknown']);
 
-export const pathSignature = (path: readonly Pick<PathStep, 'appKey' | 'action'>[]) => path.map((s) => `${s.appKey}:${s.action}`).join('>');
+/**
+ * Id signature = the ordered apps of the canonical path (consecutive repeats collapsed).
+ * Actions are left out on purpose: they are inferred from titles and wobble between audits
+ * ("paste" vs "edit"), while the app hand-off chain is what makes a workflow the same one.
+ */
+export function pathSignature(path: readonly Pick<PathStep, 'appKey'>[]): string {
+  const apps: string[] = [];
+  for (const s of path) if (apps[apps.length - 1] !== s.appKey) apps.push(s.appKey);
+  return apps.join('>');
+}
 
 /** `wf_` + first 10 hex of sha256(signature). */
 export const workflowId = (signature: string) => `wf_${sha256Hex(signature).slice(0, 10)}`;
@@ -97,8 +106,8 @@ export function consensusPath(medoid: readonly PathStep[], members: readonly Tas
     const n = Math.max(1, members.length);
     return { st, idx, full: full / n, app: app / n };
   });
-  let keep = scored.filter((x) => x.full >= support || (x.app >= support && x.full >= support / 2));
-  if (!keep.length) keep = scored.filter((x) => x.app >= support);
+  let keep = scored.filter((x) => x.full >= support);
+  if (new Set(keep.map((x) => x.st.appKey)).size < 2) keep = scored.filter((x) => x.full >= support || x.app >= support);
   if (!keep.length) keep = scored;
   // collapse consecutive duplicates
   const collapsed: typeof keep = [];

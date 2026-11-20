@@ -28,7 +28,8 @@ function loadEvents(raw: unknown): ActivityEvent[] {
   return arr.map((e) => ActivityEvent.parse(e));
 }
 
-export const SYNTH_SEEDS = [11, 29, 47];
+// 11, 29, 47 were inspected while tuning; 101-108 are held out.
+export const SYNTH_SEEDS = [11, 29, 47, 101, 102, 103, 104, 105, 106, 107, 108];
 
 async function main() {
   const results: PersonaEval[] = [];

@@ -139,9 +139,14 @@ export function segmentTasks(sessions: readonly FocusSession[], opts: SegmentOpt
     if (ep.apps.has(y.s.appKey)) {
       const newWindow = !ep.windows.has(windowKey(y.s));
       const first = ep.items.find((z) => z.s.activeSeconds >= cfg.minStepSeconds) ?? ep.items[0]!;
-      // Back at the first step with a new document after visiting other apps: the next instance has started.
+      // Back in the first step's app with a new document after visiting other apps (same action, or unrelated text): a new task has started.
       const restart =
-        newWindow && ep.apps.size >= 2 && y.s.appKey === first.s.appKey && y.s.action === first.s.action && y.s.activeSeconds >= cfg.minStepSeconds && prev.s.appKey !== y.s.appKey;
+        newWindow &&
+        ep.apps.size >= 2 &&
+        y.s.appKey === first.s.appKey &&
+        prev.s.appKey !== y.s.appKey &&
+        y.s.activeSeconds >= cfg.minStepSeconds &&
+        (y.s.action === first.s.action || cosine(y.vec, first.vec) < cfg.topicContinueSimilarity);
       const differentDoc =
         newWindow &&
         y.s.appKey === prev.s.appKey &&
