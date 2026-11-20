@@ -1,0 +1,11 @@
+/* @tracer/ui stylesheet. Import once at the app root, after Tailwind if you use it:
+ *   @import "tailwindcss";
+ *   @import "@tracer/ui/theme.css";
+ *   @import "@tracer/ui/styles.css";
+ */
+@layer base, components;
+@import './tokens.css';
+@import './base.css';
+@import './components.css';
+@import './domain.css';
+@import './print.css';

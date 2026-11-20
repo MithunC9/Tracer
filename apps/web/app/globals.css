@@ -1,0 +1,6 @@
+@import 'tailwindcss';
+@import '@tracer/ui/theme.css';
+@import '@tracer/ui/styles.css';
+
+/* Tailwind scans app code; @tracer/ui ships its own class-based CSS, so it is not scanned. */
+@source '../app';

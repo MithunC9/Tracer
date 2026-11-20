@@ -1,0 +1,68 @@
+/*
+ * Tailwind v4 theme preset for Tracer.
+ *
+ *   @import "tailwindcss";
+ *   @import "@tracer/ui/theme.css";
+ *
+ * Maps Tailwind theme variables onto the --tr-* custom properties so utilities
+ * (bg-paper, text-ink, border-rule, font-display, text-display-2 ...) follow the
+ * active theme (light / dark / print) automatically. `inline` keeps the var()
+ * reference so a [data-theme] subtree can re-theme itself.
+ */
+@theme inline {
+  /* Reset Tailwind's palette: only Tracer colors exist. */
+  --color-*: initial;
+  --color-paper: var(--tr-paper);
+  --color-paper-sunk: var(--tr-paper-sunk);
+  --color-paper-raised: var(--tr-paper-raised);
+  --color-ink: var(--tr-ink);
+  --color-graphite: var(--tr-graphite);
+  --color-rule: var(--tr-rule);
+  --color-signal: var(--tr-signal);
+  --color-signal-ink: var(--tr-signal-ink);
+  --color-on-signal: var(--tr-on-signal);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --font-display: var(--tr-font-display);
+  --font-sans: var(--tr-font-sans);
+  --font-mono: var(--tr-font-mono);
+
+  --text-hero: var(--tr-text-hero);
+  --text-hero--line-height: var(--tr-leading-hero);
+  --text-hero--letter-spacing: var(--tr-tracking-hero);
+  --text-display-1: var(--tr-text-display1);
+  --text-display-1--line-height: var(--tr-leading-display1);
+  --text-display-1--letter-spacing: var(--tr-tracking-display1);
+  --text-display-2: var(--tr-text-display2);
+  --text-display-2--line-height: var(--tr-leading-display2);
+  --text-display-2--letter-spacing: var(--tr-tracking-display2);
+  --text-display-3: var(--tr-text-display3);
+  --text-display-3--line-height: var(--tr-leading-display3);
+  --text-display-3--letter-spacing: var(--tr-tracking-display3);
+  --text-title: var(--tr-text-title);
+  --text-title--line-height: var(--tr-leading-title);
+  --text-lede: var(--tr-text-lede);
+  --text-lede--line-height: var(--tr-leading-lede);
+  --text-body: var(--tr-text-body);
+  --text-body--line-height: var(--tr-leading-body);
+  --text-small: var(--tr-text-small);
+  --text-small--line-height: var(--tr-leading-small);
+  --text-micro: var(--tr-text-micro);
+  --text-micro--line-height: var(--tr-leading-micro);
+  --text-kicker: var(--tr-text-kicker);
+  --text-kicker--line-height: var(--tr-leading-kicker);
+  --text-kicker--letter-spacing: var(--tr-tracking-kicker);
+
+  --radius-*: initial;
+  --radius-none: 0;
+  --radius-hint: 2px;
+
+  --shadow-*: initial;
+
+  --ease-out: var(--tr-ease-out);
+  --ease-in-out: var(--tr-ease-in-out);
+
+  --container-measure: var(--tr-measure);
+  --container-page: var(--tr-grid-max);
+}

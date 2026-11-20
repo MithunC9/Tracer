@@ -1,0 +1,104 @@
+/* Print: the report as a document. Ink on white (tokens.css swaps colors), no chrome,
+   margin notes kept in a narrow right column, a page per finding. */
+@media print {
+  @page {
+    size: A4;
+    margin: 18mm 16mm 20mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    font-size: 10pt;
+  }
+
+  /* Anything marked as screen chrome goes. */
+  nav,
+  .tr-noprint,
+  .tr-skip,
+  .tr-theme,
+  .tr-toasts,
+  .tr-guides,
+  .tr-week__switch,
+  .tr-ledger__keys,
+  .tr-ledger__sort .tr-ledger__arrow,
+  .tr-disclosure__btn,
+  .tr-tools__cta a::after {
+    display: none !important;
+  }
+
+  .tr-page {
+    max-width: none;
+    padding: 0;
+  }
+
+  /* Margin notes stay in the margin, like a printed paper. */
+  .tr-spread {
+    grid-template-columns: 1fr 13.5rem !important;
+    column-gap: 7mm;
+  }
+  .tr-spread__main {
+    grid-column: 1 !important;
+  }
+  .tr-spread__notes {
+    grid-column: 2 !important;
+  }
+  .tr-note {
+    border-left: 0;
+    border-top: 0.5pt solid #000;
+    padding: 2mm 0 0;
+    font-size: 8pt;
+  }
+
+  .tr-finding {
+    break-before: page;
+  }
+  .tr-finding__more {
+    gap: 8mm;
+  }
+  .tr-finding__mast,
+  .tr-metrics,
+  .tr-scale,
+  .tr-recipe__step,
+  .tr-tools__opt,
+  .tr-ledger__row,
+  .tr-receipt,
+  figure {
+    break-inside: avoid;
+  }
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  /* Disclosures print open; count-up prints the final number. */
+  .tr-stat__value {
+    visibility: visible !important;
+  }
+  .tr-stat__underline path {
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+  .tr-collapse {
+    height: auto !important;
+    opacity: 1 !important;
+  }
+
+  a.tr-link[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-family: var(--tr-font-mono);
+    font-size: 7pt;
+    color: #4a4740;
+    word-break: break-all;
+  }
+
+  .tr-week__weekend {
+    fill: #f1f1ef;
+  }
+  .tr-receipt {
+    -webkit-mask: none;
+    mask: none;
+    border: 0.5pt dashed #000;
+  }
+}
