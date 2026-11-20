@@ -17,3 +17,4 @@ One line each: what, and why. Newest at the bottom. Overrides of the original te
 - Envelope encryption: per-user DEK (AES-256-GCM) wrapped by `MASTER_KEY` from env. Deleting the wrapped DEK crypto-shreds residual copies.
 - Agent is split into a Tauri-free Rust crate (`tracer-core`: capture trait, redaction, buffer, uploader, simulator) and the Tauri shell, so the core builds and tests on Linux CI without WebKit.
 - Fixtures live in `packages/fixtures` (TS generator + committed JSON outputs + ground truth), consumed by pipeline tests, the agent simulator and the seed script.
+- Fixture raw captures and the hostile redaction corpus contain synthetic secret-shaped strings; GitHub push protection blocks them, so they are generated at build time (deterministic, ~2s) and gitignored. Redacted events.json + ground truth are committed.
