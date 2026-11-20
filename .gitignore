@@ -14,3 +14,4 @@ target/
 playwright-report/
 test-results/
 apps/agent/src-tauri/gen/
+.claude/worktrees/
