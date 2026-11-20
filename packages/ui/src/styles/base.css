@@ -1,0 +1,195 @@
+/* Base: element defaults, type, focus, layout grid. Lives in the `base` layer so
+   Tailwind utilities (when present) win over it. */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    background: var(--tr-paper);
+    color: var(--tr-ink);
+  }
+
+  body {
+    margin: 0;
+    background: var(--tr-paper);
+    color: var(--tr-ink);
+    font-family: var(--tr-font-sans);
+    font-size: var(--tr-text-body);
+    line-height: var(--tr-leading-body);
+    font-feature-settings: 'ss01' on;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--tr-ink);
+    color: var(--tr-paper);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  figure,
+  blockquote,
+  dl,
+  dd,
+  ol,
+  ul {
+    margin: 0;
+  }
+
+  ol,
+  ul {
+    padding: 0;
+  }
+
+  img,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--tr-font-mono);
+    font-size: 0.92em;
+  }
+
+  /* Every focusable thing gets the same ring: 2px ink, offset off the paper. */
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    outline: 2px solid var(--tr-ink);
+    outline-offset: 3px;
+    border-radius: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* ---------- helpers ---------- */
+  .tr-vh {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .tr-num,
+  .tr-mono {
+    font-family: var(--tr-font-mono);
+    font-variant-numeric: tabular-nums slashed-zero;
+    font-feature-settings: 'tnum' on, 'zero' on;
+    letter-spacing: -0.01em;
+  }
+
+  .tr-skip {
+    position: absolute;
+    left: var(--tr-page-margin);
+    top: 0.5rem;
+    z-index: var(--tr-z-toast);
+    padding: 0.5rem 0.75rem;
+    background: var(--tr-ink);
+    color: var(--tr-paper);
+    font-size: var(--tr-text-small);
+    transform: translateY(-200%);
+  }
+  .tr-skip:focus-visible {
+    transform: none;
+  }
+
+  /* ---------- page + editorial grid ---------- */
+  .tr-page {
+    position: relative;
+    width: 100%;
+    max-width: calc(var(--tr-grid-max) + 2 * var(--tr-page-margin));
+    margin-inline: auto;
+    padding-inline: var(--tr-page-margin);
+  }
+
+  .tr-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--tr-grid-gutter);
+  }
+
+  /* Column guides: the visible grid of a lab record. Decorative. */
+  .tr-guides {
+    position: absolute;
+    inset: 0 var(--tr-page-margin);
+    pointer-events: none;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--tr-grid-gutter);
+    z-index: 0;
+  }
+  .tr-guides > span {
+    border-inline: var(--tr-rule-hair) solid color-mix(in oklab, var(--tr-rule) 55%, transparent);
+  }
+
+  .tr-spread {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--tr-grid-gutter);
+    row-gap: var(--tr-space-4);
+    align-items: start;
+  }
+  .tr-spread__main {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+  .tr-spread__notes {
+    grid-column: 1 / -1;
+    min-width: 0;
+    display: grid;
+    gap: var(--tr-space-4);
+  }
+  @media (min-width: 64rem) {
+    .tr-spread__main {
+      grid-column: 1 / span 8;
+    }
+    .tr-spread__notes {
+      grid-column: 10 / span 3;
+    }
+    .tr-spread[data-wide] .tr-spread__main {
+      grid-column: 1 / span 9;
+    }
+    .tr-spread[data-wide] .tr-spread__notes {
+      grid-column: 10 / span 3;
+    }
+  }
+}
