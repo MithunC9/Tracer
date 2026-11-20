@@ -1,0 +1,27 @@
+{
+  "apps": [
+    "bank_portal",
+    "password_manager",
+    "health_portal"
+  ],
+  "domains": [
+    "chase.com",
+    "bankofamerica.com",
+    "wellsfargo.com",
+    "mercury.com",
+    "my.1password.com",
+    "vault.bitwarden.com",
+    "mychart.org",
+    "patient.portal"
+  ],
+  "titleKeywords": [
+    "incognito",
+    "private browsing",
+    "inprivate",
+    "password",
+    "bank",
+    "medical",
+    "therapy"
+  ],
+  "privateBrowsing": true
+}

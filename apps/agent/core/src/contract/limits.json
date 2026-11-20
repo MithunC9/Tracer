@@ -1,0 +1,17 @@
+{
+  "maxEventsPerBatch": 1000,
+  "maxBatchBytes": 2097152,
+  "maxWindowTitleChars": 256,
+  "maxDigestTextChars": 2000,
+  "maxDigestItems": 40,
+  "maxDigestItemChars": 120,
+  "minAuditDays": 1,
+  "maxAuditDays": 14,
+  "pairingCodeTtlSeconds": 600,
+  "accessTokenTtlSeconds": 900,
+  "refreshTokenTtlSeconds": 2592000,
+  "defaultUploadIntervalSeconds": 300,
+  "idleThresholdSeconds": 120,
+  "embeddingDims": 256,
+  "schemaVersion": 1
+}

@@ -1,0 +1,477 @@
+[
+  {
+    "key": "gmail",
+    "name": "Gmail",
+    "bundleIds": [],
+    "hosts": [
+      "mail.google.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "outlook",
+    "name": "Outlook",
+    "bundleIds": [
+      "com.microsoft.Outlook"
+    ],
+    "hosts": [
+      "outlook.office.com",
+      "outlook.live.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "apple_mail",
+    "name": "Mail",
+    "bundleIds": [
+      "com.apple.mail"
+    ],
+    "hosts": [],
+    "excludedByDefault": false
+  },
+  {
+    "key": "google_calendar",
+    "name": "Google Calendar",
+    "bundleIds": [],
+    "hosts": [
+      "calendar.google.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "apple_calendar",
+    "name": "Calendar",
+    "bundleIds": [
+      "com.apple.iCal"
+    ],
+    "hosts": [],
+    "excludedByDefault": false
+  },
+  {
+    "key": "calendly",
+    "name": "Calendly",
+    "bundleIds": [],
+    "hosts": [
+      "calendly.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "zoom",
+    "name": "Zoom",
+    "bundleIds": [
+      "us.zoom.xos"
+    ],
+    "hosts": [
+      "zoom.us"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "google_meet",
+    "name": "Google Meet",
+    "bundleIds": [],
+    "hosts": [
+      "meet.google.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "slack",
+    "name": "Slack",
+    "bundleIds": [
+      "com.tinyspeck.slackmacgap"
+    ],
+    "hosts": [
+      "app.slack.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "teams",
+    "name": "Microsoft Teams",
+    "bundleIds": [
+      "com.microsoft.teams2"
+    ],
+    "hosts": [
+      "teams.microsoft.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "asana",
+    "name": "Asana",
+    "bundleIds": [],
+    "hosts": [
+      "app.asana.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "linear",
+    "name": "Linear",
+    "bundleIds": [
+      "com.linear"
+    ],
+    "hosts": [
+      "linear.app"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "trello",
+    "name": "Trello",
+    "bundleIds": [],
+    "hosts": [
+      "trello.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "notion",
+    "name": "Notion",
+    "bundleIds": [
+      "notion.id"
+    ],
+    "hosts": [
+      "www.notion.so",
+      "notion.so"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "jira",
+    "name": "Jira",
+    "bundleIds": [],
+    "hosts": [
+      "atlassian.net"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "google_sheets",
+    "name": "Google Sheets",
+    "bundleIds": [],
+    "hosts": [
+      "docs.google.com/spreadsheets"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "google_docs",
+    "name": "Google Docs",
+    "bundleIds": [],
+    "hosts": [
+      "docs.google.com/document"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "excel",
+    "name": "Excel",
+    "bundleIds": [
+      "com.microsoft.Excel"
+    ],
+    "hosts": [],
+    "excludedByDefault": false
+  },
+  {
+    "key": "word",
+    "name": "Word",
+    "bundleIds": [
+      "com.microsoft.Word"
+    ],
+    "hosts": [],
+    "excludedByDefault": false
+  },
+  {
+    "key": "numbers",
+    "name": "Numbers",
+    "bundleIds": [
+      "com.apple.iWork.Numbers"
+    ],
+    "hosts": [],
+    "excludedByDefault": false
+  },
+  {
+    "key": "finder",
+    "name": "Finder",
+    "bundleIds": [
+      "com.apple.finder"
+    ],
+    "hosts": [],
+    "excludedByDefault": false
+  },
+  {
+    "key": "google_drive",
+    "name": "Google Drive",
+    "bundleIds": [],
+    "hosts": [
+      "drive.google.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "dropbox",
+    "name": "Dropbox",
+    "bundleIds": [
+      "com.getdropbox.dropbox"
+    ],
+    "hosts": [
+      "www.dropbox.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "pdf_viewer",
+    "name": "Preview",
+    "bundleIds": [
+      "com.apple.Preview"
+    ],
+    "hosts": [],
+    "excludedByDefault": false
+  },
+  {
+    "key": "hubspot",
+    "name": "HubSpot",
+    "bundleIds": [],
+    "hosts": [
+      "app.hubspot.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "salesforce",
+    "name": "Salesforce",
+    "bundleIds": [],
+    "hosts": [
+      "lightning.force.com",
+      "my.salesforce.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "pipedrive",
+    "name": "Pipedrive",
+    "bundleIds": [],
+    "hosts": [
+      "app.pipedrive.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "zendesk",
+    "name": "Zendesk",
+    "bundleIds": [],
+    "hosts": [
+      "zendesk.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "intercom",
+    "name": "Intercom",
+    "bundleIds": [],
+    "hosts": [
+      "app.intercom.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "mailchimp",
+    "name": "Mailchimp",
+    "bundleIds": [],
+    "hosts": [
+      "mailchimp.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "linkedin",
+    "name": "LinkedIn",
+    "bundleIds": [],
+    "hosts": [
+      "www.linkedin.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "shopify",
+    "name": "Shopify",
+    "bundleIds": [],
+    "hosts": [
+      "admin.shopify.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "quickbooks",
+    "name": "QuickBooks Online",
+    "bundleIds": [],
+    "hosts": [
+      "qbo.intuit.com",
+      "app.qbo.intuit.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "xero",
+    "name": "Xero",
+    "bundleIds": [],
+    "hosts": [
+      "go.xero.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "stripe",
+    "name": "Stripe Dashboard",
+    "bundleIds": [],
+    "hosts": [
+      "dashboard.stripe.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "bill_com",
+    "name": "BILL",
+    "bundleIds": [],
+    "hosts": [
+      "app.bill.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "expensify",
+    "name": "Expensify",
+    "bundleIds": [],
+    "hosts": [
+      "www.expensify.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "bank_portal",
+    "name": "Bank website",
+    "bundleIds": [],
+    "hosts": [
+      "chase.com",
+      "bankofamerica.com",
+      "wellsfargo.com",
+      "mercury.com"
+    ],
+    "excludedByDefault": true
+  },
+  {
+    "key": "figma",
+    "name": "Figma",
+    "bundleIds": [
+      "com.figma.Desktop"
+    ],
+    "hosts": [
+      "www.figma.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "canva",
+    "name": "Canva",
+    "bundleIds": [],
+    "hosts": [
+      "www.canva.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "vscode",
+    "name": "VS Code",
+    "bundleIds": [
+      "com.microsoft.VSCode"
+    ],
+    "hosts": [],
+    "excludedByDefault": false
+  },
+  {
+    "key": "github",
+    "name": "GitHub",
+    "bundleIds": [],
+    "hosts": [
+      "github.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "terminal",
+    "name": "Terminal",
+    "bundleIds": [
+      "com.apple.Terminal",
+      "com.googlecode.iterm2"
+    ],
+    "hosts": [],
+    "excludedByDefault": false
+  },
+  {
+    "key": "apple_notes",
+    "name": "Notes",
+    "bundleIds": [
+      "com.apple.Notes"
+    ],
+    "hosts": [],
+    "excludedByDefault": false
+  },
+  {
+    "key": "ai_chat",
+    "name": "AI assistant (web)",
+    "bundleIds": [
+      "com.anthropic.claudefordesktop",
+      "com.openai.chat"
+    ],
+    "hosts": [
+      "claude.ai",
+      "chatgpt.com",
+      "gemini.google.com"
+    ],
+    "excludedByDefault": false
+  },
+  {
+    "key": "browser",
+    "name": "Web browser",
+    "bundleIds": [
+      "com.google.Chrome",
+      "com.apple.Safari",
+      "org.mozilla.firefox",
+      "company.thebrowser.Browser",
+      "com.brave.Browser"
+    ],
+    "hosts": [],
+    "excludedByDefault": false
+  },
+  {
+    "key": "password_manager",
+    "name": "Password manager",
+    "bundleIds": [
+      "com.1password.1password",
+      "com.agilebits.onepassword7",
+      "com.bitwarden.desktop",
+      "com.apple.Passwords",
+      "com.apple.keychainaccess"
+    ],
+    "hosts": [
+      "my.1password.com",
+      "vault.bitwarden.com"
+    ],
+    "excludedByDefault": true
+  },
+  {
+    "key": "health_portal",
+    "name": "Health portal",
+    "bundleIds": [
+      "com.apple.Health"
+    ],
+    "hosts": [
+      "mychart.org",
+      "patient.portal"
+    ],
+    "excludedByDefault": true
+  }
+]
