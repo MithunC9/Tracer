@@ -1,11 +1,18 @@
 /** Dev aid: dump episodes of a synthetic persona with ground-truth labels and cluster membership. */
+import { readFileSync } from 'node:fs';
+import { ActivityEvent, GroundTruth } from '@tracer/schema';
 import { fallbackDeps, runPipeline } from '../src/index.js';
 import { PERSONAS, synthesize } from '../test/synth.js';
 
-const pi = Number(process.argv[2] ?? 0);
-const seed = Number(process.argv[3] ?? 47);
+// usage: debug.ts <personaIndex> <seed> [v]   |   debug.ts <fixturePersona> - [v]
+const arg = process.argv[2] ?? '0';
 const verbose = process.argv[4] === 'v';
-const { events, groundTruth: gt } = synthesize(PERSONAS[pi]!, seed);
+const { events, groundTruth: gt } = /^\d+$/.test(arg)
+  ? synthesize(PERSONAS[Number(arg)]!, Number(process.argv[3] ?? 47))
+  : {
+      events: (JSON.parse(readFileSync(new URL(`../../fixtures/data/${arg}/events.json`, import.meta.url), 'utf8')) as unknown[]).map((e) => ActivityEvent.parse(e)),
+      groundTruth: GroundTruth.parse(JSON.parse(readFileSync(new URL(`../../fixtures/data/${arg}/ground-truth.json`, import.meta.url), 'utf8'))),
+    };
 const res = await runPipeline(events, { auditId: '00000000-0000-4000-8000-000000000000', startsAt: gt.startsAt, daysPlanned: 7, generatedAt: gt.startsAt }, fallbackDeps);
 const ses = new Map(res.sessions.map((s) => [s.id, s]));
 const wfOf = (start: string, end: string) => {

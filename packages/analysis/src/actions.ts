@@ -3,7 +3,7 @@ import { appCategory } from './apps.js';
 
 /**
  * Coarse action inference from redacted window title / digest text / clipboard signals.
- * Order of evidence: window title keywords > clipboard activity > digest keywords >
+ * Order of evidence: window title keywords > digest headings > clipboard activity >
  * very short visit (navigate) > the app category's typical action.
  */
 const RULES: ReadonlyArray<readonly [ActionVerb, RegExp]> = [
@@ -13,7 +13,7 @@ const RULES: ReadonlyArray<readonly [ActionVerb, RegExp]> = [
   ['import', /\bimport|\bbulk upload|\bupload (csv|file|statement)/],
   ['upload', /\bupload|\battach file/],
   ['download', /\bdownload/],
-  ['compose', /\bcompose|\breply\b|\bnew (message|email|post|mail)|\bdraft|\bforward\b|\bwrite\b|\bnew conversation/],
+  ['compose', /\bcompose|\breply\b|\bnew (message|email|post|mail|issue|task|comment)|\bdraft|\bforward\b|\bwrite\b|\bnew conversation|\bcreate (issue|task)/],
   ['schedule', /\bschedul|\bbook (a )?(meeting|call)|\bnew event|\bcalendar invite|\bavailability|\breschedul/],
   ['review', /\breview|\bpull request|\bproofread|\binspect|\bqa\b|\baudit\b/],
   ['search', /\bsearch|\bresults for\b|\bfind\b|\blook ?up\b/],
@@ -50,7 +50,9 @@ const PASTE_TARGETS = new Set<AppCategory>(['spreadsheet', 'docs', 'crm', 'accou
 export interface ActionSignals {
   appKey: string;
   title: string | null;
-  digestText: string;
+  /** Headings of the on-screen digest (dialog / page titles). Body text and button labels are not used:
+   *  code, email bodies and ever-present buttons ("Export", "Compose") are not evidence of an action. */
+  headings: string;
   activeSeconds: number;
   /** Clipboard changes during this session (something was copied here). */
   clipboardEvents: number;
@@ -68,11 +70,11 @@ export function matchVerb(text: string): ActionVerb | null {
 export function inferAction(s: ActionSignals): ActionVerb {
   const fromTitle = matchVerb(s.title ?? '');
   if (fromTitle) return fromTitle;
+  const fromHeadings = matchVerb(s.headings);
+  if (fromHeadings) return fromHeadings;
   const cat = appCategory(s.appKey);
   if (s.clipboardEvents > 0) return 'copy';
   if (s.clipboardFromPrevious && PASTE_TARGETS.has(cat)) return 'paste';
-  const fromDigest = matchVerb(s.digestText);
-  if (fromDigest) return fromDigest;
   if (s.activeSeconds < 15) return 'navigate';
   return CATEGORY_DEFAULT[cat] ?? 'read';
 }

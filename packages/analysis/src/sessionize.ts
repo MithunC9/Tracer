@@ -34,7 +34,8 @@ interface Span extends Target {
   start: number;
   end: number;
   eventIds: string[];
-  digests: Map<string, string>;
+  /** digestHash -> { headings, body } (button labels are dropped: they are UI chrome, not activity) */
+  digests: Map<string, { headings: string; body: string }>;
   clipboard: number;
 }
 
@@ -47,8 +48,9 @@ function sortEvents(events: readonly ActivityEvent[]): { e: ActivityEvent; t: nu
     .sort((a, b) => a.t - b.t || a.e.seq - b.e.seq || (a.e.id < b.e.id ? -1 : a.e.id > b.e.id ? 1 : 0));
 }
 
-function digestString(d: { headings: string[]; labels: string[]; text: string }): string {
-  return [d.headings.join(' '), d.labels.join(' '), d.text].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+const squash = (x: string) => x.replace(/\s+/g, ' ').trim();
+function digestParts(d: { headings: string[]; labels: string[]; text: string }): { headings: string; body: string } {
+  return { headings: squash(d.headings.join(' · ')), body: squash(d.text) };
 }
 
 export function sessionizeWithStats(events: readonly ActivityEvent[], partialCfg?: Partial<AnalysisConfig>): { sessions: FocusSession[]; stats: CaptureStats } {
@@ -187,7 +189,7 @@ export function sessionizeWithStats(events: readonly ActivityEvent[], partialCfg
           const k = resolveAppKey(e.app.key, c.urlHost);
           if (k === c.appKey || e.app.key === c.rawKey) {
             c.eventIds.push(e.id);
-            if (!c.digests.has(e.digestHash)) c.digests.set(e.digestHash, digestString(e.digest));
+            if (!c.digests.has(e.digestHash)) c.digests.set(e.digestHash, digestParts(e.digest));
           }
         }
         break;
@@ -278,14 +280,17 @@ function toSessions(spans: Span[], maxDigest: number): FocusSession[] {
   let prev: { appKey: string; clipboard: number; end: number } | null = null;
   for (const s of spans) {
     let digestText = '';
+    let headings = '';
     for (const d of s.digests.values()) {
-      if (digestText.length >= maxDigest) break;
-      digestText = digestText ? `${digestText} ${d}` : d;
+      if (headings.length < maxDigest && d.headings && !headings.includes(d.headings)) headings = headings ? `${headings} · ${d.headings}` : d.headings;
+      if (digestText.length >= maxDigest) continue;
+      const piece = squash(`${d.headings} ${d.body}`);
+      digestText = digestText ? `${digestText} ${piece}` : piece;
     }
     digestText = digestText.slice(0, maxDigest);
     const activeSeconds = Math.round((s.end - s.start) / 100) / 10;
     const clipboardFromPrevious = !!prev && prev.clipboard > 0 && prev.appKey !== s.appKey && s.start - prev.end < 5 * 60 * 1000;
-    const action = inferAction({ appKey: s.appKey, title: s.title, digestText, activeSeconds, clipboardEvents: s.clipboard, clipboardFromPrevious });
+    const action = inferAction({ appKey: s.appKey, title: s.title, headings, activeSeconds, clipboardEvents: s.clipboard, clipboardFromPrevious });
     sessions.push({
       id: stableId('ses_', `${s.eventIds[0] ?? ''}|${s.start}`),
       appKey: s.appKey,

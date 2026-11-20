@@ -1,8 +1,9 @@
 import { LIMITS, type FocusSession, type PathStep, type TaskEpisode } from '@tracer/schema';
 import { stepLabel } from './actions.js';
-import { appName } from './apps.js';
+import { appCategory, appName } from './apps.js';
 import { DEFAULT_CONFIG, type AnalysisConfig } from './config.js';
-import { addScaled, cosine, hashEmbed } from './text.js';
+import { addScaled, cosine, hashEmbed, tokenize } from './text.js';
+import { centerEmbeddings } from './similarity.js';
 import { DAY_MS, stableId, toIso, toMs } from './util.js';
 
 export type Embedder = (text: string) => number[];
@@ -19,10 +20,15 @@ interface S {
   end: number;
   vec: number[];
   day: number;
+  /** Active seconds of the run of consecutive sessions in this app starting here. */
+  runAhead: number;
+  blockAhead: boolean;
 }
 
 interface Ep {
   items: S[];
+  /** Short detours (chat pings, inbox peeks) we came straight back from. */
+  detours: S[];
   apps: Set<string>;
   windows: Set<string>;
   centroid: number[];
@@ -30,6 +36,12 @@ interface Ep {
   lastEnd: number;
   /** End of the last session in this episode that copied something (-inf if none). */
   lastCopyEnd: number;
+  /** Active seconds so far. */
+  active: number;
+  /** Active seconds of the trailing run of sessions in the same app. */
+  tailRun: number;
+  /** Distinct documents in that trailing run. */
+  tailDocs: Set<string>;
   day: number;
 }
 
@@ -72,7 +84,7 @@ export function habitTransitions(items: readonly { appKey: string; start: number
     const share = c / (out.get(from) ?? 1);
     // lift: hub apps everyone switches to (chat, email) do not count as a specific hand-off
     const lift = share / ((inn.get(to) ?? 1) / Math.max(1, total));
-    if (c >= cfg.habitMinCount && (days.get(k)?.size ?? 0) >= cfg.habitMinDays && share >= cfg.habitMinShare && lift >= 2) habits.add(k);
+    if (c >= cfg.habitMinCount && (days.get(k)?.size ?? 0) >= cfg.habitMinDays && share >= cfg.habitMinShare && lift >= 3) habits.add(k);
   }
   return habits;
 }
@@ -107,8 +119,27 @@ export function segmentTasks(sessions: readonly FocusSession[], opts: SegmentOpt
   };
   const items: S[] = sorted.map((s, i) => {
     const start = toMs(s.start);
-    return { s, i, start, end: toMs(s.end), vec: vecOf(sessionText(s)), day: dayOf(start) };
+    return { s, i, start, end: toMs(s.end), vec: vecOf(sessionText(s)), day: dayOf(start), runAhead: s.activeSeconds, blockAhead: false };
   });
+  // Words present in most windows (the company name in every chat title, the user's own name) say
+  // nothing about the topic: compare session texts after removing the audit-wide mean.
+  if (cfg.centerSessionText) {
+    const centered = centerEmbeddings(items.map((x) => x.vec));
+    items.forEach((x, k) => (x.vec = centered[k] ?? x.vec));
+  }
+  // runAhead: active time of the same-app run starting here; blockAhead: that run is a focus block
+  // (long, and spanning several different documents — deep work, not one long step on one item).
+  {
+    let docs = new Set<string>();
+    for (let k = items.length - 1; k >= 0; k--) {
+      const a = items[k]!;
+      const b = items[k + 1];
+      if (b && a.s.appKey === b.s.appKey && b.start - a.end < cfg.episodeGapSeconds * 1000) a.runAhead = a.s.activeSeconds + b.runAhead;
+      else docs = new Set();
+      docs.add(a.s.windowTitle ?? '');
+      a.blockAhead = a.runAhead >= cfg.focusBlockSeconds && docs.size >= 2;
+    }
+  }
   const habits = habitTransitions(
     items.map((x) => ({ appKey: x.s.appKey, start: x.start, end: x.end, day: x.day, seconds: x.s.activeSeconds })),
     cfg,
@@ -117,7 +148,7 @@ export function segmentTasks(sessions: readonly FocusSession[], opts: SegmentOpt
   const episodes: Ep[] = [];
   let cur: Ep | null = null;
   const startEp = (x: S): Ep => {
-    const ep: Ep = { items: [], apps: new Set(), windows: new Set(), centroid: new Array<number>(x.vec.length).fill(0), start: x.start, lastEnd: x.end, lastCopyEnd: Number.NEGATIVE_INFINITY, day: x.day };
+    const ep: Ep = { items: [], detours: [], apps: new Set(), windows: new Set(), centroid: new Array<number>(x.vec.length).fill(0), start: x.start, lastEnd: x.end, lastCopyEnd: Number.NEGATIVE_INFINITY, active: 0, tailRun: 0, tailDocs: new Set(), day: x.day };
     episodes.push(ep);
     add(ep, x);
     return ep;
@@ -129,36 +160,58 @@ export function segmentTasks(sessions: readonly FocusSession[], opts: SegmentOpt
     addScaled(ep.centroid, x.vec, Math.log(2 + Math.min(x.s.activeSeconds, 1800) / 30));
     ep.lastEnd = Math.max(ep.lastEnd, x.end);
     if (x.s.clipboardEvents > 0) ep.lastCopyEnd = x.end;
+    const last = ep.items[ep.items.length - 2];
+    const sameRun = !!last && last.s.appKey === x.s.appKey;
+    ep.tailRun = sameRun ? ep.tailRun + x.s.activeSeconds : x.s.activeSeconds;
+    if (!sameRun) ep.tailDocs = new Set();
+    ep.tailDocs.add(x.s.windowTitle ?? '');
+    ep.active += x.s.activeSeconds;
   };
   /**
    * Does session y continue episode ep (whose last kept session is prev)?
    * 'continue' / 'split' (a clear new instance or different document) / 'unknown'.
    */
-  const judge = (ep: Ep, prev: S, y: S, allowClipboard: boolean): 'continue' | 'split' | 'unknown' => {
+  type Verdict = 'continue' | 'restart' | 'split' | 'unknown';
+  const judge = (ep: Ep, prev: S, y: S, allowClipboard: boolean): Verdict => {
     const simC = cosine(y.vec, ep.centroid);
     if (ep.apps.has(y.s.appKey)) {
       const newWindow = !ep.windows.has(windowKey(y.s));
       const first = ep.items.find((z) => z.s.activeSeconds >= cfg.minStepSeconds) ?? ep.items[0]!;
-      // Back in the first step's app with a new document after visiting other apps (same action, or unrelated text): a new task has started.
+      // Back in the first step's app, doing the first step again on a new item, after visiting other apps.
+      let maxSameApp = -1;
+      for (const z of ep.items) if (z.s.appKey === y.s.appKey) maxSameApp = Math.max(maxSameApp, cosine(y.vec, z.vec));
+      // (a near-identical title is the same item seen again, e.g. returning to the PR after testing it)
       const restart =
         newWindow &&
+        !ep.items.some((z) => z.s.appKey === y.s.appKey && titleJaccard(z.s.windowTitle, y.s.windowTitle) >= cfg.sameItemSimilarity) &&
         ep.apps.size >= 2 &&
         y.s.appKey === first.s.appKey &&
         prev.s.appKey !== y.s.appKey &&
         y.s.activeSeconds >= cfg.minStepSeconds &&
-        (y.s.action === first.s.action || cosine(y.vec, first.vec) < cfg.topicContinueSimilarity);
-      const differentDoc =
-        newWindow &&
-        y.s.appKey === prev.s.appKey &&
-        cosine(y.vec, prev.vec) < cfg.sameAppSplitSimilarity &&
-        y.s.activeSeconds >= 60 &&
-        prev.s.clipboardEvents === 0;
-      return restart || differentDoc ? 'split' : 'continue';
+        y.s.action === first.s.action;
+      if (restart) return 'restart';
+      // A different document in an app the task already used, unrelated to anything the task did in that app:
+      // a detour if we come straight back, otherwise a new task.
+      const differentDoc = newWindow && maxSameApp < cfg.sameAppSplitSimilarity && y.s.activeSeconds >= cfg.minStepSeconds;
+      return differentDoc ? 'split' : 'continue';
+    }
+    // A long block of work in a single app is an activity of its own; leaving it for another app
+    // starts something new unless the words carry over.
+    // Symmetrically, settling into a new app for a long block needs more than a passing word overlap.
+    // Only clearly shared words, or a copy made on a short hand-off visit, count. A habit alone does not
+    // (switching from chat to the editor every day is a routine, not a hand-off), nor does copying out of a
+    // long work block (copying is constant in some apps, e.g. an editor).
+    const leavingBlock = ep.tailRun >= cfg.focusBlockSeconds && ep.tailDocs.size >= 2;
+    if (leavingBlock || y.blockAhead) {
+      if (simC >= 2 * cfg.topicContinueSimilarity) return 'continue';
+      const handoffCopy = !leavingBlock && prev.s.clipboardEvents > 0 && prev.s.activeSeconds < cfg.focusBlockSeconds && y.start - prev.end < 120_000;
+      if (!handoffCopy) return 'split';
+      return allowClipboard ? 'continue' : 'unknown';
     }
     if (simC >= cfg.topicContinueSimilarity) return 'continue';
     if (habits.has(`${prev.s.appKey}>${y.s.appKey}`)) return 'continue';
-    // something was copied in this task moments ago: carrying data to the next app
-    if (allowClipboard && y.start - ep.lastCopyEnd < 5 * 60_000) return 'continue';
+    // the previous step copied something moments ago: carrying data to the next app
+    if (allowClipboard && prev.s.clipboardEvents > 0 && y.start - prev.end < 120_000) return 'continue';
     return 'unknown';
   };
   /** A short foreign run starting at i, after which the task visibly continues: index of the continuation, or -1. */
@@ -186,7 +239,9 @@ export function segmentTasks(sessions: readonly FocusSession[], opts: SegmentOpt
     }
     const prev = cur.items[cur.items.length - 1]!;
     const gap = x.start - cur.lastEnd;
-    if (gap > cfg.episodeGapSeconds * 1000 || x.day !== cur.day || x.end - cur.start > cfg.maxEpisodeSeconds * 1000) {
+    // Meetings are events, not task steps: a call can trigger a workflow but its time is not part of it.
+    const meeting = appCategory(x.s.appKey) === 'meetings' || appCategory(prev.s.appKey) === 'meetings';
+    if (meeting || gap > cfg.episodeGapSeconds * 1000 || x.day !== cur.day || x.end - cur.start > cfg.maxEpisodeSeconds * 1000) {
       cur = startEp(x);
       continue;
     }
@@ -195,17 +250,20 @@ export function segmentTasks(sessions: readonly FocusSession[], opts: SegmentOpt
       add(cur, x);
       continue;
     }
-    if (j === 'split') {
+    if (j === 'restart') {
       cur = startEp(x);
       continue;
     }
+    // 'split' or 'unknown': a short detour we come straight back from is dropped
     const k = interruptionEnd(cur, prev, i);
     if (k > i) {
-      // drop the interruption run; resume at the continuation
+      // a detour we came straight back from is not part of the task: not in its path or topic, and by
+      // default not in its time either (keepDetourTime counts it as time spent in the occurrence)
+      if (cfg.keepDetourTime) for (let d = i; d < k; d++) cur.detours.push(items[d]!);
       i = k - 1;
       continue;
     }
-    if (judge(cur, prev, x, true) === 'continue') add(cur, x);
+    if (j === 'unknown' && judge(cur, prev, x, true) === 'continue') add(cur, x);
     else if (x.s.activeSeconds < cfg.minStepSeconds) continue; // too short to judge: passing through
     else cur = startEp(x);
   }
@@ -213,22 +271,34 @@ export function segmentTasks(sessions: readonly FocusSession[], opts: SegmentOpt
 
   const out: TaskEpisode[] = [];
   for (const ep of episodes) {
-    const active = ep.items.reduce((a, x) => a + x.s.activeSeconds, 0);
+    const all = [...ep.items, ...ep.detours].sort((a, b) => a.start - b.start);
+    const active = all.reduce((a, x) => a + x.s.activeSeconds, 0);
     if (active < cfg.minEpisodeSeconds) continue;
-    const ss = ep.items.map((x) => x.s);
-    const path = buildPath(ss, cfg.minStepSeconds);
+    const ss = all.map((x) => x.s);
+    const path = buildPath(ep.items.map((x) => x.s), cfg.minStepSeconds);
     out.push({
       id: stableId('ep_', ss[0]!.id),
       sessionIds: ss.map((s) => s.id),
       start: toIso(ep.start),
-      end: toIso(Math.max(...ep.items.map((x) => x.end))),
+      end: toIso(Math.max(...all.map((x) => x.end))),
       activeSeconds: Math.round(active * 10) / 10,
       path,
-      embedding: embed(episodeText(ss)).map((v) => Math.round(v * 1e5) / 1e5),
+      // the topic comes from the task itself, not from detours
+      embedding: embed(episodeText(ep.items.map((x) => x.s))).map((v) => Math.round(v * 1e5) / 1e5),
       dayIndex: ep.day,
     });
   }
   return out;
+}
+
+/** Jaccard overlap of the normalized words of two window titles. */
+export function titleJaccard(a: string | null, b: string | null): number {
+  const A = new Set(tokenize(a ?? ''));
+  const B = new Set(tokenize(b ?? ''));
+  if (!A.size || !B.size) return 0;
+  let inter = 0;
+  for (const w of A) if (B.has(w)) inter++;
+  return inter / (A.size + B.size - inter);
 }
 
 const MAX_EPISODE_PATH = 24;

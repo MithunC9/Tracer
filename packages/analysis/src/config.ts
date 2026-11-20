@@ -33,6 +33,14 @@ export interface AnalysisConfig {
   topicContinueSimilarity: number;
   /** Same app, but text cosine to the previous session below this = different document = topic shift. */
   sameAppSplitSimilarity: number;
+  /** Count detour time (chat pings inside a task) as part of the occurrence's time. Off: detours are not the workflow. */
+  keepDetourTime: boolean;
+  /** Remove the audit-wide mean from session text vectors before comparing them. */
+  centerSessionText: boolean;
+  /** Title word overlap (Jaccard) at or above which two windows of the same app show the same item (no restart). */
+  sameItemSimilarity: number;
+  /** A single-app run this long is a focus block; leaving it for another app starts a new episode unless the words carry over. */
+  focusBlockSeconds: number;
   /** Habitual app hand-offs: min distinct days and count for a transition to glue two apps. */
   habitMinDays: number;
   habitMinCount: number;
@@ -58,6 +66,8 @@ export interface AnalysisConfig {
    * unrelated text are coincidences (e.g. writing different docs then searching the web).
    */
   minTextCohesion: number;
+  /** Findings need at least this many different apps: a loop inside one app (inbox triage, coding) is not a hand-off workflow. */
+  minPathApps: number;
   /** Findings need at least this many distinct steps (single-step activity is not a workflow). */
   minPathSteps: number;
 
@@ -80,6 +90,10 @@ export const DEFAULT_CONFIG: AnalysisConfig = {
   interruptionMaxSessions: 3,
   topicContinueSimilarity: 0.2,
   sameAppSplitSimilarity: 0.1,
+  keepDetourTime: false,
+  centerSessionText: true,
+  sameItemSimilarity: 0.6,
+  focusBlockSeconds: 10 * 60,
   habitMinDays: 2,
   habitMinCount: 3,
   habitMinShare: 0.25,
@@ -92,6 +106,7 @@ export const DEFAULT_CONFIG: AnalysisConfig = {
   maxPathSteps: 8,
   minTextCohesion: 0.4,
   minPathSteps: 2,
+  minPathApps: 2,
 
   maxFindings: 10,
   maxEvidencePerFinding: 30,

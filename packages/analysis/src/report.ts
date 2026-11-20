@@ -241,7 +241,7 @@ export function methodology(cfg: AnalysisConfig): { title: string; body: string 
     },
     {
       title: 'How we found workflows',
-      body: `Focus sessions are grouped into tasks: a new task starts after a ${Math.round(cfg.episodeGapSeconds / 60)}-minute break or when the topic clearly changes. Short interruptions (a chat ping, a quick email check) that you return from are left out of the task. Tasks are then compared across days by the order of apps and actions, which apps they use, and the words in window titles. Tasks that are similar enough are grouped into one workflow. Only workflows seen at least ${SCORING.minOccurrences} times are reported.`,
+      body: `Focus sessions are grouped into tasks: a new task starts after a ${Math.round(cfg.episodeGapSeconds / 60)}-minute break, when the topic clearly changes, around meetings, and around long focus blocks in one app. Short interruptions (a chat ping, a quick email check) that you return from are left out of the task. Tasks are then compared across days by the order of apps and actions, which apps they use, and the words in window titles. Tasks that are similar enough are grouped into one workflow. Only workflows that span at least two apps and were seen at least ${SCORING.minOccurrences} times are reported.`,
     },
     {
       title: 'How we scored them',
@@ -280,7 +280,7 @@ export function limitations(x: LimitationInputs): string[] {
   if (stats.pausedMinutes > 0) out.push(`Capture was paused for ${Math.round(stats.pausedMinutes)} minutes; nothing from that time is included.`);
   if (stats.silentGaps > 0) out.push(`There ${stats.silentGaps === 1 ? 'was 1 gap' : `were ${stats.silentGaps} gaps`} with no data at all (computer asleep or agent offline); that time is not counted.`);
   out.push(`Workflows seen fewer than ${SCORING.minOccurrences} times are not reported.`);
-  out.push('Single-step activities and pure reading (for example, checking chat) are not reported as workflows.');
+  out.push('Activity inside a single app (inbox triage, coding, browsing) and pure reading are not reported as workflows; meetings are never counted as workflow time.');
   if (x.clustersFound > x.findingsReported && x.findingsReported >= x.maxFindings) out.push(`Only the top ${x.maxFindings} workflows are shown; ${x.clustersFound - x.findingsReported} smaller ones were left out.`);
   out.push('Actions such as "export" or "paste" are inferred from window titles and on-screen text, and can be wrong.');
   out.push('Work away from this computer (phone, paper, meetings in person) is invisible to Tracer.');
