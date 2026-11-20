@@ -341,11 +341,11 @@ const weeklyReport: RecipeTemplate = {
     const sheet = c.has('excel') ? 'excel' : c.has('google_sheets') ? 'google_sheets' : null;
     const sheetName = sheet ? c.name(sheet) : 'a spreadsheet';
     const sources = c.pathApps().filter((a) => a !== sheet && c.categoryOf(a) !== 'email' && c.categoryOf(a) !== 'chat');
-    const srcText = sources.length ? sources.map((a) => c.name(a)).join(', ') : 'each source app';
+    const srcText = sources.length ? c.list(sources) : 'each source app';
     const out = c.nameOf('email', 'email', 'chat');
     return {
       title: `Build the recurring report in ${sheetName} from live data`,
-      prerequisites: [`${sheetName} you can share`, `Read access to ${srcText}`, 'Last week\'s report as a reference'],
+      prerequisites: [`${sheet ? `A ${sheetName} file` : 'A spreadsheet'} you can share`, `Read access to ${srcText}`, 'Last week\'s report as a reference'],
       steps: [
         step('List every number in last week\'s report and where it came from.'),
         step(`Make a ${sheetName} file with one "data" tab per source and one "report" tab that only holds formulas pointing at the data tabs.`, sheet),
@@ -454,7 +454,7 @@ const copyPasteConnector: RecipeTemplate = {
       prerequisites: [`Accounts in ${fromName} and ${toName}`, 'A connector platform account (Zapier, Make or n8n)'],
       steps: [
         step(`Write down exactly which fields you copy from ${fromName} and where each goes in ${toName}.`, from),
-        step(`In the connector platform, start a new automation with a ${fromName} trigger that fires when the record you copy is created or updated.`, from, 'If there is no trigger for it, a scheduled "search for new records" step works.'),
+        step(`In the connector platform, start a new automation triggered in ${fromName} when the record you copy is created or updated.`, from, 'If there is no trigger for it, a scheduled "search for new records" step works.'),
         step(`Add a ${toName} action that creates or updates the matching record, and map each field from your list.`, to),
         step('Add a lookup step so it updates an existing record instead of creating a duplicate.'),
         step('Run it with one test record, compare the result with what you would have pasted, and switch it on.'),
@@ -473,7 +473,7 @@ export const GENERIC_TEMPLATE: RecipeTemplate = {
   match: () => 0,
   build: (c: RecipeContext) => {
     const apps = c.pathApps();
-    const appsText = apps.length ? apps.map((a) => c.name(a)).join(', ') : 'the apps involved';
+    const appsText = apps.length ? c.list(apps) : 'the apps involved';
     return {
       title: `Cut the manual steps out of "${c.label}"`,
       prerequisites: [`Access to ${appsText}`, 'Twenty minutes to watch yourself do it once'],

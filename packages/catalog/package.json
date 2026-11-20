@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "pnpm --filter @tracer/schema build && tsc -p tsconfig.json",
-    "typecheck": "pnpm --filter @tracer/schema build && tsc -p tsconfig.json --noEmit",
+    "typecheck": "pnpm --filter @tracer/schema build && tsc -p tsconfig.test.json",
     "test": "vitest run"
   },
   "dependencies": {

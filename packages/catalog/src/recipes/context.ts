@@ -86,6 +86,11 @@ export class RecipeContext {
   pathApps(): string[] {
     return [...new Set(this.input.canonicalPath.map((s) => s.appKey))].filter((a) => a !== 'browser');
   }
+  /** "A", "A and B", "A, B and C" using display names. */
+  list(apps: readonly string[]): string {
+    const n = apps.map((a) => this.name(a));
+    return n.length <= 1 ? (n[0] ?? '') : `${n.slice(0, -1).join(', ')} and ${n[n.length - 1]}`;
+  }
   /** First path step with the given action, if any. */
   stepWith(...a: ActionVerb[]): PathStep | undefined {
     return this.input.canonicalPath.find((s) => a.includes(s.action));
