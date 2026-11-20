@@ -1,0 +1,31 @@
+# Analysis decisions (local)
+
+One line each, newest at the bottom.
+
+- Package depends only on `@tracer/schema`; catalog/llm are reached through `PipelineDeps` ports; `fallbackDeps` makes it runnable standalone.
+- `tsx` (dev only) runs the eval script so it can import the synthetic generator from `test/` without shipping it in `dist`.
+- Eval CLI lives in `scripts/eval.ts`; the evaluation logic (`evaluatePersona`, `matchClusters`, `summarize`) is in `src/eval/evaluate.ts` and exported.
+- `idle_start` is emitted after the threshold elapsed, so the threshold is trimmed from the session (`trimIdleLeadIn`).
+- "Gaps > idle threshold" interpreted as: no idle signal + no events for > 30 min = agent off, credit at most one idle threshold. Shorter silences without idle_start are activity (the agent would have reported idle).
+- `stopped`/`auto_stopped` cut sessions but are not counted as user-paused minutes; only `paused`→`resumed` is.
+- Sub-3s focus that moves on (not returning) is folded into the previous window as well (passing through on Cmd-Tab).
+- Browser focus with a host resolves to the site's AppKey, else `other:<host>`.
+- Action evidence order: title > clipboard > digest > short visit (navigate) > app-category default. Calendar default is `read` (viewing ≠ scheduling).
+- Session/episode ids are sha256-derived from the first event id / first session id (stable across reruns).
+- Segmentation is greedy with explicit rules (gap, restart-of-first-step, same-app different doc, text similarity, clipboard carry, habit hand-offs with lift >= 2, interruption excision); interruptions are dropped from the episode, not just from the path.
+- Interruption runs may not contain a clipboard copy (copying is task work).
+- Episode similarity = 0.3 sequence (weighted LCS) + 0.2 app overlap + 0.5 text; average linkage at 0.55.
+- Text similarity uses embeddings centred on the audit's mean episode embedding (cheap IDF substitute for hashed features).
+- Clusters need mean pairwise (centred) text similarity >= 0.4; separated planted (>= 0.58) from coincidental app sequences (<= 0.38) on synth.
+- App names/hosts are stopwords for the embedder: app identity is compared by the app-overlap term, not the text term.
+- Findings need >= 2 distinct canonical steps and at least one non-passive step (read/navigate/unknown only = not reported).
+- Workflow id signature = ordered distinct apps of the canonical path (actions excluded: they wobble between audits); collisions get `#2`, `#3` by first appearance.
+- `totalMinutes` = sum of member episodes' active seconds (interruptions already excluded).
+- Repeatability = mean sequence similarity of occurrences to the canonical path; rule-based share = mean verb weight over canonical steps (det 1 / neutral 0.5 / judgement 0); integration = 0.5 mean + 0.5 min of app automation scores; risk = capped sum of tag weights.
+- Score inputs are rounded (2 dp) before outputs are computed, so `automationPotential(inputs)` etc. recompute exactly from the persisted inputs.
+- Days observed = first-to-last active day inclusive, minus ≥90%-paused empty days, capped at days planned (calendar-week basis per DECISIONS.md).
+- Summary total = sum of rounded per-finding reclaimable hours (so the shown calculation adds up).
+- Narrator/recommender failures fall back to templates/generic recipe with a limitation note instead of failing the run; a failed number validation re-renders all prose from templates and re-validates.
+- Stage cache key = sha256(stable JSON of {stage, stage version, full config, input}); cache hit emits `succeeded` with `attempts: 0`.
+- The validate/publish stage hashes exclude `generatedAt` and usage so cached reruns are reusable.
+- Synth eval seeds 11/29/47 were inspected while tuning; 101-108 are held out and included in the default eval run.
