@@ -39,7 +39,7 @@ export function CalcSteps({ steps, decimals, className, caption }: CalcStepsProp
             </th>
             <td className="tr-calc__expr tr-num">{s.expression}</td>
             <td className="tr-calc__val tr-num">
-              {fmt(s.value, decimals ?? (Number.isInteger(s.value) ? 0 : Math.abs(s.value) < 1 ? 2 : 1))}
+              {fmt(s.value, decimals ?? (s.unit ? 1 : Number.isInteger(s.value) ? 0 : Math.abs(s.value) < 1 ? 2 : 1))}
               {s.unit ? <span className="tr-calc__unit"> {s.unit}</span> : null}
             </td>
           </tr>

@@ -4,7 +4,7 @@
   --tr-font-display: var(--font-instrument-serif), "Instrument Serif", "Iowan Old Style", Georgia, serif;
   --tr-font-sans: var(--font-geist), "Geist", ui-sans-serif, system-ui, sans-serif;
   --tr-font-mono: var(--font-geist-mono), "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  --tr-text-hero: clamp(4.5rem, 3rem + 9vw, 11rem);
+  --tr-text-hero: clamp(6rem, 3.5rem + 9vw, 11rem);
   --tr-leading-hero: 0.86;
   --tr-tracking-hero: -0.045em;
   --tr-text-display1: clamp(3rem, 2rem + 5vw, 6.5rem);

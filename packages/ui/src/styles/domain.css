@@ -319,7 +319,7 @@
     font-size: var(--tr-text-micro);
     color: var(--tr-graphite);
   }
-  @media (max-width: 47.99rem) {
+  @container tr-ledger (max-width: 47.99rem) {
     .tr-ledger__glyph {
       display: none;
     }
@@ -377,35 +377,36 @@
     column-gap: 0.7rem;
     align-items: end;
   }
-  .tr-trail__n {
-    grid-column: 1;
+  .tr-trail__meta {
+    grid-column: 2;
     grid-row: 1;
-    font-size: var(--tr-text-kicker);
-    color: var(--tr-graphite);
-  }
-  .tr-trail__verb {
-    grid-column: 1;
-    grid-row: 1;
-    margin-left: 2.1em;
     font-size: var(--tr-text-kicker);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--tr-graphite);
   }
-  .tr-trail__app {
+  .tr-trail__step:first-child .tr-trail__meta,
+  .tr-trail__step:first-child .tr-trail__app {
     grid-column: 1;
+  }
+  .tr-trail__n {
+    letter-spacing: 0;
+  }
+  .tr-trail__app {
+    grid-column: 2;
     grid-row: 2;
     font-family: var(--tr-font-display);
     font-size: 1.6rem;
     line-height: 1.1;
     white-space: nowrap;
+    margin-right: 0.7rem;
   }
   .tr-trail__link {
-    grid-column: 2;
+    grid-column: 1;
     grid-row: 2;
     width: 2.75rem;
     height: 0.6rem;
-    margin: 0 0.7rem 0.55rem 0;
+    margin-bottom: 0.55rem;
     overflow: visible;
   }
   .tr-trail__link path {
@@ -570,7 +571,7 @@
     white-space: normal;
     min-width: 10rem;
   }
-  @media (max-width: 47.99rem) {
+  @container tr-week (max-width: 47.99rem) {
     .tr-week__row {
       grid-template-columns: 1fr 2.2rem;
       row-gap: 0.25rem;
@@ -722,7 +723,7 @@
     color: var(--tr-signal-ink);
     font-size: var(--tr-text-micro);
   }
-  @media (max-width: 47.99rem) {
+  @container tr-score (max-width: 47.99rem) {
     .tr-scale {
       grid-template-columns: 1fr auto;
     }
@@ -846,7 +847,7 @@
     padding: 1rem 1.25rem 1.25rem 0;
     border-bottom: var(--tr-rule-hair) solid var(--tr-rule);
   }
-  @media (min-width: 48rem) {
+  @container tr-tools (min-width: 48rem) {
     .tr-tools__opt + .tr-tools__opt {
       padding-left: 1.25rem;
       border-left: var(--tr-rule-hair) solid var(--tr-rule);
@@ -1033,7 +1034,7 @@
     display: grid;
     gap: 3rem;
   }
-  @media (max-width: 47.99rem) {
+  @container tr-finding (max-width: 47.99rem) {
     .tr-finding__mast {
       grid-template-columns: auto 1fr;
     }
@@ -1329,7 +1330,7 @@
   .tr-access__req {
     color: var(--tr-graphite);
   }
-  @media (max-width: 47.99rem) {
+  @container tr-access (max-width: 47.99rem) {
     .tr-access__req {
       display: none;
     }
@@ -1446,5 +1447,27 @@
     color: var(--tr-graphite);
     border-top: 1px dashed var(--tr-graphite);
     padding-top: 0.8rem;
+  }
+}
+
+/* Size containers: components adapt to the column they sit in, not the viewport. */
+@layer components {
+  .tr-ledger {
+    container: tr-ledger / inline-size;
+  }
+  .tr-week {
+    container: tr-week / inline-size;
+  }
+  .tr-score {
+    container: tr-score / inline-size;
+  }
+  .tr-tools {
+    container: tr-tools / inline-size;
+  }
+  .tr-finding {
+    container: tr-finding / inline-size;
+  }
+  .tr-access {
+    container: tr-access / inline-size;
   }
 }

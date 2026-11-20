@@ -9,6 +9,7 @@
   padding-top: 1.25rem;
 }
 .ds-mast__bar {
+  flex-wrap: wrap;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -106,6 +107,7 @@
 .ds-spec {
   display: grid;
   gap: 0.9rem;
+  align-content: start;
   min-width: 0;
 }
 .ds-spec__label {
@@ -347,6 +349,7 @@
   padding-bottom: 6rem;
 }
 .rp-bar {
+  flex-wrap: wrap;
   display: flex;
   justify-content: space-between;
   align-items: center;

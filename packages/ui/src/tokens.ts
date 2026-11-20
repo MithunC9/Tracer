@@ -90,7 +90,7 @@ export const font = {
 
 /** Type scale. [size, line-height, letter-spacing]. Display sizes are fluid. */
 export const type = {
-  hero: ['clamp(4.5rem, 3rem + 9vw, 11rem)', '0.86', '-0.045em'],
+  hero: ['clamp(6rem, 3.5rem + 9vw, 11rem)', '0.86', '-0.045em'],
   display1: ['clamp(3rem, 2rem + 5vw, 6.5rem)', '0.92', '-0.02em'],
   display2: ['clamp(2.25rem, 1.6rem + 2.8vw, 4rem)', '0.98', '-0.015em'],
   display3: ['clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem)', '1.04', '-0.01em'],

@@ -568,14 +568,12 @@ export default function DesignPage() {
         <Specimen label="Ledger" state="long labels" wide>
           <LedgerTable rows={longRows} caption="Long content" highlightId={report.summary.topFindingId} />
         </Specimen>
-        <div className="ds-grid2">
-          <Specimen label="Ledger" state="loading">
-            <LedgerTable rows={[]} loading caption="Ranked workflows" />
-          </Specimen>
-          <Specimen label="Ledger" state="empty">
-            <LedgerTable rows={[]} caption="Ranked workflows" />
-          </Specimen>
-        </div>
+        <Specimen label="Ledger" state="loading" wide>
+          <LedgerTable rows={[]} loading caption="Ranked workflows" />
+        </Specimen>
+        <Specimen label="Ledger" state="empty" wide>
+          <LedgerTable rows={[]} caption="Ranked workflows" />
+        </Specimen>
         <Specimen label="Ledger" state="error" wide>
           <LedgerErrorDemo rows={rows} />
         </Specimen>

@@ -21,7 +21,7 @@ export function CountdownBadge({ day, total, status = 'capturing', className }: 
       </span>
       <span className="tr-count__cells" aria-hidden="true">
         {Array.from({ length: total }, (_, i) => (
-          <span key={i} data-state={i < d - 1 ? 'done' : i === d - 1 ? 'now' : 'todo'} />
+          <span key={i} data-state={i < d - 1 || (status === 'complete' && i < d) ? 'done' : i === d - 1 ? 'now' : 'todo'} />
         ))}
       </span>
     </p>

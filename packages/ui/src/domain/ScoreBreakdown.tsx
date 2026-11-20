@@ -96,7 +96,7 @@ export function ScoreBreakdown({ breakdown, showFormula = true, className }: Sco
             i.riskFlags.length ? (
               <span className="tr-score__flags">
                 {i.riskFlags.map((f) => (
-                  <Tag key={f} tone="signal">
+                  <Tag key={f} tone="outline">
                     {riskWord[f] ?? f}
                   </Tag>
                 ))}

@@ -36,17 +36,19 @@ export function PathTrail({ steps, variant = 'full', names, className }: PathTra
     <ol className={cx('tr-trail', className)} data-variant="full" aria-label="Path through apps">
       {steps.map((s, i) => (
         <li key={i} className="tr-trail__step" title={s.label}>
-          <span className="tr-trail__n tr-num" aria-hidden="true">
-            {String(i + 1).padStart(2, '0')}
-          </span>
-          <span className="tr-trail__verb tr-num">{s.action}</span>
-          <span className="tr-trail__app">{names?.[s.appKey] ?? appName(s.appKey)}</span>
-          {i < steps.length - 1 ? (
+          {i > 0 ? (
             <svg className="tr-trail__link" viewBox="0 0 40 8" preserveAspectRatio="none" aria-hidden="true">
               <path d="M0 4.2 Q20 3.4 37 4" fill="none" vectorEffect="non-scaling-stroke" />
               <path d="M34 1.2 L39.5 4 L34 6.8" fill="none" vectorEffect="non-scaling-stroke" />
             </svg>
           ) : null}
+          <span className="tr-trail__meta">
+            <span className="tr-trail__n tr-num" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>{' '}
+            <span className="tr-trail__verb tr-num">{s.action}</span>
+          </span>
+          <span className="tr-trail__app">{names?.[s.appKey] ?? appName(s.appKey)}</span>
         </li>
       ))}
     </ol>

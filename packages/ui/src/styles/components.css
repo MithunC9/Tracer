@@ -229,7 +229,7 @@
     outline-color: var(--tr-signal);
   }
 
-  .tr-btn:disabled {
+  .tr-btn:disabled:not([data-loading]) {
     cursor: not-allowed;
     --_bg: transparent;
     --_fg: var(--tr-graphite);
@@ -241,8 +241,9 @@
   }
   .tr-btn[data-loading] {
     cursor: progress;
-    --_fg: var(--tr-ink);
-    --_bd: var(--tr-ink);
+  }
+  .tr-btn[data-loading] .tr-btn__label {
+    opacity: 0.85;
   }
   .tr-btn__progress {
     position: absolute;
@@ -705,9 +706,8 @@
   }
   .tr-tip__bubble {
     position: absolute;
-    left: 50%;
+    left: 0;
     bottom: calc(100% + 8px);
-    transform: translateX(-50%);
     z-index: var(--tr-z-popover);
     width: max-content;
     max-width: 16rem;
@@ -724,7 +724,7 @@
   .tr-tip__bubble::after {
     content: '';
     position: absolute;
-    left: 50%;
+    left: 1rem;
     top: 100%;
     width: 1px;
     height: 8px;

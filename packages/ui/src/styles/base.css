@@ -135,6 +135,7 @@
   /* ---------- page + editorial grid ---------- */
   .tr-page {
     position: relative;
+    isolation: isolate;
     width: 100%;
     max-width: calc(var(--tr-grid-max) + 2 * var(--tr-page-margin));
     margin-inline: auto;

@@ -127,7 +127,7 @@ export function AccessErrorDemo() {
 
 export function ToggleDemo() {
   const [paused, setPaused] = useState(false);
-  return <Toggle label="Pause capture" hint={paused ? 'Paused. Nothing is recorded.' : 'Recording app focus and window titles.'} checked={paused} onChange={setPaused} onLabel="Paused" offLabel="On" />;
+  return <Toggle label="Pause capture" hint={paused ? 'Paused. Nothing is recorded.' : 'Recording app focus and window titles.'} checked={paused} onChange={setPaused} onLabel="Paused" offLabel="Off" />;
 }
 
 export function InlineConfirmDemo() {

@@ -170,7 +170,7 @@ const drafts: Draft[] = [
     risk: 0.4,
     riskFlags: ['money'],
     cohesion: 0.88,
-    why: () => 'Same three apps in the same order every morning, and most steps are matching numbers. Money is involved, so the score is halved for risk weight.',
+    why: () => 'Same three apps in the same order every morning, and most steps are matching numbers. Money moves, so a risk penalty applies.',
     headline: (n) => `Your mornings start with ${n.avgMinutes} minutes of matching Stripe payouts by hand`,
     body: (n) =>
       `You exported payouts from Stripe, cleaned the CSV in Excel and reconciled deposits in QuickBooks on ${n.daysSeen} of 7 days. The steps barely changed. Fees and refunds were matched by eye each time.\n\nThis is the workflow with the most time to win back: about ${n.reclaim} hours a week. A sync tool can post payouts with fees split out; you keep the final reconcile click.`,
