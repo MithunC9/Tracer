@@ -1,7 +1,7 @@
 /**
  * Drizzle table definitions. Source of truth for `drizzle-kit generate`.
  * Mirrors apps/api/db/schema-draft.sql (the cross-agent DB contract); deviations are listed
- * in DECISIONS.local.md. Row-level security, roles and SECURITY DEFINER functions live in the
+ * in DECISIONS.md (apps/api). Row-level security, roles and SECURITY DEFINER functions live in the
  * hand-written migration `0002_rls_roles_functions.sql` because drizzle-kit cannot express
  * FORCE ROW LEVEL SECURITY or SECURITY DEFINER.
  */

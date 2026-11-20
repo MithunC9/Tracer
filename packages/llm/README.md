@@ -37,7 +37,7 @@ Build `summary.calculation` with `buildSummaryCalculation(findings)` and the sum
 - Narration: `narrateFinding`, `narrateSummary`. The output schema refuses numbers outside `allowedNumbers` and banned words, so violations get repaired before they reach the report.
 - Validator: `validateReport`, `assertValidReport`, CLI `tracer-validate-report report.json [--json]` (exit 1 on failure, 2 on IO error).
 
-Number rules (exact match, no rounding; masks for names with digits; how ordinals, percentages and number words count) are in `src/numbers.ts` and `DECISIONS.local.md`.
+Number rules (exact match, no rounding; masks for names with digits; how ordinals, percentages and number words count) are in `src/numbers.ts` and the root `DECISIONS.md` (packages/llm).
 
 ## Tests
 

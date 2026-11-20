@@ -89,4 +89,5 @@ CSRF token, pairing-code hash and the metrics token use `safeEqual` (sha256 both
 - No password reset or email verification flow (no email infrastructure in scope).
 - MASTER_KEY is a single env secret, not a KMS key. Key rotation is supported by `user_keys.key_version` but not implemented.
 - `subjectHash` is plain sha256(userId), as specified by the contract. A keyed hash would resist confirmation attacks; proposed as a contract change.
-- Dev seed credentials: `demo@tracer.local` / `tracer-demo-password` exist only if `pnpm --filter @tracer/api seed` is run. Never seed production.
+- Dev seed credentials: `demo@tracer.local` / `tracer-demo-password` exist only if `pnpm seed` (or `pnpm dev`, which runs it) is run. Never seed production.
+- The default analysis engine stores LLM responses in `llm_cache`, encrypted with the user's DEK and RLS-scoped; episode embeddings are not stored in plaintext pgvector (invertible hashed-token vectors), see DECISIONS.md (Integration).

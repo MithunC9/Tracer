@@ -29,8 +29,8 @@ Tracer is a time-boxed workflow audit. It is **only for self-observation**: the 
 | Path | Owns | Depends on |
 |---|---|---|
 | `packages/schema` | **The contract.** Zod types for events, API, pipeline stages, report, scoring formula, catalog types, route table, typed client, OpenAPI emitter. | zod |
-| `packages/analysis` | Pure pipeline stage functions + evaluation against ground truth. | schema, catalog, llm |
-| `packages/catalog` | 40+ tool entries, affiliate registry (separate), ranking engine, recipe templates. | schema |
+| `packages/analysis` | Pure pipeline stage functions + evaluation against ground truth. | schema (catalog and llm reach it through injected `PipelineDeps` ports, wired in `apps/api/src/pipeline/analysis-engine.ts`) |
+| `packages/catalog` | 57 tool entries, affiliate registry (separate), ranking engine, recipe templates. | schema |
 | `packages/llm` | Provider-agnostic client (Anthropic + deterministic mock), structured output, retries, cache, cost accounting, number validator. | schema |
 | `packages/fixtures` | 5 synthetic 7-day personas with planted workflows + ground truth. | schema |
 | `packages/ui` | Design tokens and primitives (ledger table, finding card, week strip, stat figure). | — |
@@ -59,7 +59,7 @@ Tracer is a time-boxed workflow audit. It is **only for self-observation**: the 
 | recommend | scored | + recipe, ranked tools | catalog ranking; affiliate attached after |
 | narrate | findings | narrative prose | LLM (mock offline); numbers forbidden unless allowed |
 | validate | report | pass/fail | rejects any untraceable number |
-| publish | report | stored report | audit → `complete` |
+| publish | report | stored report | `assertValidReport` must pass, else the stage fails (never stored); audit → `complete` |
 
 Jobs run on pg-boss with retries + exponential backoff, a dead-letter queue, and per-stage status at `GET /v1/audits/:id/pipeline`.
 

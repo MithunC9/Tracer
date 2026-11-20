@@ -2,7 +2,7 @@
  * Number extraction from narrative prose, shared by the narrate guard and the
  * report validator so both apply exactly the same rules.
  *
- * Rules (see DECISIONS.local.md):
+ * Rules (see DECISIONS.md, packages/llm):
  *  - Digits: integers, decimals, thousands separators ("1,200"), leading-dot decimals (".5").
  *  - Suffixes glued to a number do not hide it: "3.5h", "12hrs", "2x", "3rd" (ordinal), "5k" (x1000).
  *  - "%" (optionally spaced) marks a percentage; "72%" matches an allowed 72 or 0.72.
