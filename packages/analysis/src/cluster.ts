@@ -189,6 +189,7 @@ export function clusterWorkflows(episodes: readonly TaskEpisode[], opts: Cluster
     const canonicalPath = consensusPath(eps[medoid]!.path, members, cfg.consensusSupport, cfg.maxPathSteps);
     const distinct = new Set(canonicalPath.map((s) => `${s.appKey}:${s.action}`)).size;
     if (distinct < cfg.minPathSteps) continue;
+    if (new Set(canonicalPath.map((s) => s.appKey)).size < cfg.minPathApps) continue;
     if (canonicalPath.every((s) => PASSIVE.has(s.action))) continue;
     const totalSeconds = members.reduce((a, m) => a + m.activeSeconds, 0);
     drafts.push({

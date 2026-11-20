@@ -124,7 +124,7 @@ describe('sessionize', () => {
 });
 
 describe('inferAction', () => {
-  const base = { appKey: 'other:x', title: null as string | null, digestText: '', activeSeconds: 120, clipboardEvents: 0, clipboardFromPrevious: false };
+  const base = { appKey: 'other:x', title: null as string | null, headings: '', activeSeconds: 120, clipboardEvents: 0, clipboardFromPrevious: false };
   it.each([
     ['Export payments to CSV', 'export'],
     ['payments.csv', 'export'],

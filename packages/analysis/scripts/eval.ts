@@ -1,5 +1,5 @@
 /**
- * pnpm --filter @tracer/analysis eval [--synth] [--seeds 1,2,3] [--write] [--data <dir>]
+ * pnpm --filter @tracer/analysis eval [--synth] [--seeds 1,2,3] [--personas a,b] [--write] [--data <dir>]
  *
  * Runs the pipeline (fallback deps) on every persona under packages/fixtures/data/* that has
  * events.json + ground-truth.json. With no fixtures (or --synth), runs on the seeded synthetic
@@ -39,6 +39,7 @@ async function main() {
       ? readdirSync(dataDir)
           .map((d) => join(dataDir, d))
           .filter((d) => existsSync(join(d, 'events.json')) && existsSync(join(d, 'ground-truth.json')))
+          .filter((d) => !args.includes('--personas') || args[args.indexOf('--personas') + 1]!.split(',').some((p) => d.endsWith(`/${p}`)))
           .sort()
       : [];
   if (fixtureDirs.length) {
