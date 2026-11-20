@@ -92,6 +92,13 @@ pub struct UploadReport {
     pub last_result: Option<IngestResult>,
 }
 
+/// Result of one upload pass: what got through, and the error that ended it (if any).
+#[derive(Debug)]
+pub struct UploadOutcome {
+    pub report: UploadReport,
+    pub error: Option<UploadError>,
+}
+
 pub struct Uploader {
     pub platform: Platform,
     pub agent_version: String,
@@ -130,10 +137,15 @@ impl Uploader {
 
     /// Upload until the queue is empty or a request fails. On failure the batch stays
     /// assigned (same batchId next time) and backoff is armed.
-    pub fn upload_pending(&mut self, store: &mut Store, api: &ApiClient) -> Result<UploadReport, (UploadReport, UploadError)> {
+    pub fn upload_pending(&mut self, store: &mut Store, api: &ApiClient) -> UploadOutcome {
         let mut report = UploadReport::default();
+        let error = self.upload_inner(store, api, &mut report).err();
+        UploadOutcome { report, error }
+    }
+
+    fn upload_inner(&mut self, store: &mut Store, api: &ApiClient, report: &mut UploadReport) -> Result<(), UploadError> {
         if !self.backoff.ready() {
-            return Err((report, UploadError::BackingOff(self.backoff.wait_remaining())));
+            return Err(UploadError::BackingOff(self.backoff.wait_remaining()));
         }
         loop {
             let batch = match store.open_batch() {
@@ -142,28 +154,24 @@ impl Uploader {
                     // envelope overhead (~300 bytes) is reserved from the byte cap
                     match store.create_batch(self.max_events, self.max_bytes.saturating_sub(4096)) {
                         Ok(Some(b)) => b,
-                        Ok(None) => return Ok(report),
-                        Err(e) => return Err((report, e.into())),
+                        Ok(None) => return Ok(()),
+                        Err(e) => return Err(e.into()),
                     }
                 }
-                Err(e) => return Err((report, e.into())),
+                Err(e) => return Err(e.into()),
             };
             let body = match self.envelope(&batch, Utc::now()) {
                 Ok(b) => b,
-                Err(e) => return Err((report, BufferError::Json(e).into())),
+                Err(e) => return Err(BufferError::Json(e).into()),
             };
             if body.len() > limits::MAX_BATCH_BYTES {
-                if let Err(e) = self.split(store, &batch) {
-                    return Err((report, e));
-                }
+                self.split(store, &batch)?;
                 continue;
             }
             match api.ingest(body) {
                 Ok(res) => {
                     let rejected: Vec<String> = res.rejected.iter().map(|r| r.id.clone()).collect();
-                    if let Err(e) = store.ack_batch(batch.batch_id, &rejected) {
-                        return Err((report, e.into()));
-                    }
+                    store.ack_batch(batch.batch_id, &rejected)?;
                     self.backoff.success();
                     self.max_events = (self.max_events * 2).min(limits::MAX_EVENTS_PER_BATCH);
                     report.batches += 1;
@@ -174,20 +182,18 @@ impl Uploader {
                     report.last_result = Some(res);
                     if stop {
                         // Window ended / paused / deleted: let the agent decide before sending more.
-                        return Ok(report);
+                        return Ok(());
                     }
                 }
                 Err(e) if e.status() == Some(413) || (matches!(e.status(), Some(400) | Some(422)) && !e.is_window_closed()) => {
                     log::warn!("batch {} refused ({e}); splitting", batch.batch_id);
-                    if let Err(e) = self.split(store, &batch) {
-                        return Err((report, e));
-                    }
+                    self.split(store, &batch)?;
                 }
                 Err(e) => {
                     let _ = store.record_attempt(batch.batch_id, Some(&e.to_string()));
                     let d = self.backoff.failure();
                     log::warn!("upload failed ({e}); retrying batch {} in {d:?}", batch.batch_id);
-                    return Err((report, e.into()));
+                    return Err(e.into());
                 }
             }
         }

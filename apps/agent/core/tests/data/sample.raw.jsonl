@@ -1,0 +1,17 @@
+{"t":"2026-11-16T09:00:00.000Z","type":"focus","bundleId":"com.microsoft.Excel","appName":"Microsoft Excel","title":"Q3 invoices.xlsx","url":null}
+{"t":"2026-11-16T09:00:02.000Z","type":"ax","bundleId":"com.microsoft.Excel","appName":"Microsoft Excel","headings":["Invoices"],"labels":["Customer","Amount"],"text":"Acme Corp billing@acme-corp.com card 4111 1111 1111 1111 total 1,240.00","secureField":false}
+{"t":"2026-11-16T09:00:30.000Z","type":"clipboard","bundleId":"com.microsoft.Excel","appName":"Microsoft Excel","contentKind":"text"}
+{"t":"2026-11-16T09:01:00.000Z","type":"focus","bundleId":"com.google.Chrome","appName":"Google Chrome","title":"Inbox (3) - jane.doe@acme-corp.com - Gmail","url":"https://mail.google.com/mail/u/0/#inbox/FMfcgzQXJWDsKmzrNnq"}
+{"t":"2026-11-16T09:03:00.000Z","type":"focus","bundleId":"com.1password.1password","appName":"1Password","title":"Personal vault - Banking logins","url":null}
+{"t":"2026-11-16T09:03:05.000Z","type":"ax","bundleId":"com.1password.1password","appName":"1Password","headings":["Banking logins"],"labels":["Username","Password"],"text":"my-secret-vault-note","secureField":false}
+{"t":"2026-11-16T09:03:20.000Z","type":"clipboard","bundleId":"com.1password.1password","appName":"1Password","contentKind":"text"}
+{"t":"2026-11-16T09:04:00.000Z","type":"focus","bundleId":"com.google.Chrome","appName":"Google Chrome","title":"Gift ideas - Google Search","url":"https://www.google.com/search?q=gift+ideas","private":true}
+{"t":"2026-11-16T09:06:00.000Z","type":"focus","bundleId":"com.google.Chrome","appName":"Google Chrome","title":"Contacts | HubSpot","url":"https://app.hubspot.com/contacts/123456/objects/0-1/views/all/list"}
+{"t":"2026-11-16T09:06:10.000Z","type":"ax","bundleId":"com.google.Chrome","appName":"Google Chrome","headings":["Sign in again"],"labels":["Email","Password"],"text":"correct-horse-battery-staple","secureField":true}
+{"t":"2026-11-16T09:10:00.000Z","type":"idle_start","thresholdSeconds":120}
+{"t":"2026-11-16T09:25:00.000Z","type":"idle_end"}
+{"t":"2026-11-16T09:25:05.000Z","type":"focus","bundleId":"com.google.Chrome","appName":"Google Chrome","title":"Accounts overview","url":"https://secure.chase.com/web/auth/dashboard#/dashboard/overview"}
+{"t":"2026-11-16T09:26:00.000Z","type":"focus","bundleId":"com.tinyspeck.slackmacgap","appName":"Slack","title":"#finance - Acme - Slack","url":null}
+{"t":"2026-11-16T09:27:00.000Z","type":"focus","bundleId":"com.example.WidgetPro","appName":"WidgetPro","title":"Untitled","url":null}
+{"t":"2026-11-17T09:00:00.000Z","type":"focus","bundleId":"com.microsoft.Excel","appName":"Microsoft Excel","title":"Q3 invoices.xlsx","url":null}
+{"t":"2026-11-17T09:00:30.000Z","type":"clipboard","bundleId":"com.microsoft.Excel","appName":"Microsoft Excel","contentKind":"file"}

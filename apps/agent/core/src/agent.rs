@@ -403,11 +403,8 @@ impl Agent {
     pub fn upload_now(&mut self, ts: DateTime<Utc>) -> Result<UploadReport, AgentError> {
         let Some(api) = self.api.clone() else { return Ok(UploadReport::default()) };
         self.last_upload_attempt = Some(Instant::now());
-        let result = self.uploader.upload_pending(&mut self.store, &api);
-        let (report, err) = match result {
-            Ok(r) => (r, None),
-            Err((r, e)) => (r, Some(e)),
-        };
+        let outcome = self.uploader.upload_pending(&mut self.store, &api);
+        let (report, err) = (outcome.report, outcome.error);
         self.upload_totals.batches += report.batches;
         self.upload_totals.accepted += report.accepted;
         self.upload_totals.duplicates += report.duplicates;

@@ -140,6 +140,9 @@ impl ApiClient {
 /// Plain HTTP is only allowed to loopback (local dev and tests).
 fn is_local(base: &str) -> bool {
     let rest = base.strip_prefix("http://").unwrap_or("");
+    if rest.starts_with("[::1]") {
+        return true;
+    }
     let host = rest.split(['/', ':']).next().unwrap_or("");
     matches!(host, "localhost" | "127.0.0.1" | "[::1]")
 }
