@@ -1,0 +1,21 @@
+# Catalog decisions (local)
+
+- `build`/`typecheck` scripts build `@tracer/schema` first, so `pnpm --filter @tracer/catalog build` works on a clean checkout without Turbo; tests alias `@tracer/schema` to its source.
+- fast-check (devDependency) for property tests, with fixed seeds so CI is reproducible.
+- Fit score is additive with a 100-point budget (capability 50, integration 25, budget 10, platform 5, skill 5, effort 5); penalties are negative deltas, so the reasons sum to the score.
+- Open-source preference is a penalty on closed tools (-8) rather than a bonus, to keep the 100 ceiling meaningful.
+- Trigger capabilities weigh half of work capabilities: most platforms can be triggered somehow; the work steps decide fit.
+- Generic `*` integrations earn 0.6 of the integration credit: screen/browser automation works but is brittle.
+- Native features are hard-filtered unless their host app (`integrations[0]`) is in the workflow; otherwise Xero rules showed up for QuickBooks users.
+- CRM-category tools are hard-filtered unless `crm_sync` is needed; otherwise HubSpot Free CRM ranked high for plain Gmail templates.
+- "LLM tool" = category `ai_assistant`. Penalty -10 when the workflow needs no judgement and an eligible non-AI tool covers all capabilities. Logged under factor `capability` because `FitReason.factor` has no better value (contract proposal filed).
+- Meeting recorders and email clients with AI features are not treated as LLM tools; their core job is deterministic.
+- All four AI assistants share one capability set and identical reliability copy, so no vendor gets a quiet edge.
+- `rank.ts` may only mention the word "affiliate" in `Omit<RankedTool, 'affiliate'>`; the static test strips that one string and checks the rest.
+- `recommendTools(req, constraints, opts)` takes `entries` and `affiliates` overrides in `opts` so the fuzz test can inject random registries.
+- Duplicate affiliate records for one entry: first in registry order wins.
+- Default result limit is 5.
+- Recipe template selection: highest `match` score, ties to the earlier template; specific finance templates listed first.
+- Risk checkpoints come from a fixed `RISK_CHECKPOINTS` map applied to every recipe; templates add their own on top (deduplicated).
+- Priced paid-tier entries use approximate notes (“~$20/mo”, "one-time licence") rather than exact prices.
+- Added entries beyond the brief for platform coverage: AutoHotkey, Power Automate for desktop, Windows Task Scheduler, Buffer (social scheduling).

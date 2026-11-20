@@ -1,0 +1,25 @@
+{
+  "name": "@tracer/catalog",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" }
+  },
+  "scripts": {
+    "build": "pnpm --filter @tracer/schema build && tsc -p tsconfig.json",
+    "typecheck": "pnpm --filter @tracer/schema build && tsc -p tsconfig.test.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@tracer/schema": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "fast-check": "^4.3.0",
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
