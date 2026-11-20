@@ -38,6 +38,8 @@ export class PgBossJobQueue implements JobQueue {
       migrate: true,
       max: 5,
       application_name: 'tracer-jobs',
+      // Stage jobs wake workers immediately; polling stays on as the fallback.
+      useListenNotify: true,
     });
     this.boss.on('error', (err) => this.log.error({ err }, 'pg-boss error'));
   }
@@ -55,6 +57,7 @@ export class PgBossJobQueue implements JobQueue {
         retryDelayMax: this.opts.retryDelayMaxSeconds,
         expireInSeconds: 15 * 60,
         deadLetter: QUEUE.deadLetter,
+        notify: true,
       });
     }
     await this.boss.createQueue(QUEUE.sweep, { policy: 'singleton', retryLimit: 0, expireInSeconds: 120 });
@@ -84,7 +87,8 @@ export class PgBossJobQueue implements JobQueue {
   /** Registers workers and the per-minute sweep schedule. */
   async startWorkers(pipeline: PipelineService, audits: AuditsService) {
     await this.start();
-    const poll = { pollingIntervalSeconds: this.opts.pollIntervalSeconds };
+    // Retries are delayed jobs that NOTIFY does not announce, so keep the backstop poll short too.
+    const poll = { pollingIntervalSeconds: this.opts.pollIntervalSeconds, notifyPollingIntervalSeconds: this.opts.pollIntervalSeconds };
     for (const stage of PIPELINE_STAGES) {
       await this.boss.work<PipelineJob>(QUEUE.stage(stage), { ...poll, localConcurrency: 2 }, async ([job]) => {
         if (job) await pipeline.runStageJob(job.data, job.signal);

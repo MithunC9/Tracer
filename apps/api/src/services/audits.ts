@@ -39,7 +39,7 @@ export class AuditsService {
     private readonly clock: Clock,
   ) {}
 
-  create(actor: Actor, req: CreateAuditRequest): Promise<Audit> {
+  async create(actor: Actor, req: CreateAuditRequest): Promise<Audit> {
     const now = this.clock.now();
     const startsAt = req.startsAt ? new Date(req.startsAt) : now;
     if (startsAt.getTime() < now.getTime() - START_GRACE_MS) throw errors.badRequest('startsAt must not be in the past');
