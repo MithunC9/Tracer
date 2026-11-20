@@ -162,7 +162,7 @@ describe('LlmClient cache', () => {
 
 describe('LlmClient retries', () => {
   it('retries transient errors with backoff, then succeeds', async () => {
-    const sleep = vi.fn(noSleep);
+    const sleep = vi.fn((_ms: number) => Promise.resolve());
     const provider = new MockProvider({ faultMode: 'transient_error', faultCount: 2 });
     const client = new LlmClient({ provider, sleep, random: () => 0.5, retry: { baseDelayMs: 100, maxDelayMs: 1000 } });
     await narrateFinding(client, factsFrom(0));
