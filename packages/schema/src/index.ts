@@ -11,3 +11,4 @@ export * from './api.js';
 export * from './routes.js';
 export * from './client.js';
 export * from './openapi.js';
+export * from './raw.js';
