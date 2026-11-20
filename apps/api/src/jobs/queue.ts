@@ -20,6 +20,8 @@ export interface JobQueue {
   enqueueStage(job: PipelineJob, tx?: Tx): Promise<void>;
   /** Cancel and delete every queued/active job of a user (account deletion). Returns jobs removed. */
   purgeUser(userId: string): Promise<number>;
+  /** Readiness probe. */
+  healthy(): Promise<boolean>;
 }
 
 /** Queue that drops jobs: for API-only processes and unit tests. */
@@ -32,5 +34,8 @@ export class RecordingJobQueue implements JobQueue {
     const before = this.sent.length;
     for (let i = this.sent.length - 1; i >= 0; i--) if (this.sent[i]!.userId === userId) this.sent.splice(i, 1);
     return before - this.sent.length;
+  }
+  async healthy() {
+    return true;
   }
 }

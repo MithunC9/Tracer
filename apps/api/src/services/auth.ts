@@ -167,19 +167,19 @@ export class AuthService {
     const outcome = await this.uow.run(found.userId, async (r) => {
       if (found.revokedAt || found.rotatedAt) {
         await r.refreshTokens.revokeFamily(found.familyId, now);
-        return { reuse: true as const };
+        return { kind: 'reuse' as const };
       }
-      if (found.expiresAt <= now) return { expired: true as const };
+      if (found.expiresAt <= now) return { kind: 'expired' as const };
       if (!(await r.refreshTokens.markRotated(found.id, now))) {
         await r.refreshTokens.revokeFamily(found.familyId, now);
-        return { reuse: true as const };
+        return { kind: 'reuse' as const };
       }
       const user = await r.users.findById(found.userId);
-      if (!user) return { expired: true as const };
-      return { issued: await this.issue(r, user, found.familyId) };
+      if (!user) return { kind: 'expired' as const };
+      return { kind: 'issued' as const, issued: await this.issue(r, user, found.familyId) };
     });
-    if ('issued' in outcome) return outcome.issued;
-    if ('reuse' in outcome) throw new AppError('unauthorized', 401, 'Refresh token reuse detected; all sessions in this family were revoked');
+    if (outcome.kind === 'issued') return outcome.issued;
+    if (outcome.kind === 'reuse') throw new AppError('unauthorized', 401, 'Refresh token reuse detected; all sessions in this family were revoked');
     throw errors.unauthorized('Refresh token expired');
   }
 
