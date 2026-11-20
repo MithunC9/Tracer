@@ -29,3 +29,15 @@ One line each, newest at the bottom.
 - Stage cache key = sha256(stable JSON of {stage, stage version, full config, input}); cache hit emits `succeeded` with `attempts: 0`.
 - The validate/publish stage hashes exclude `generatedAt` and usage so cached reruns are reusable.
 - Synth eval seeds 11/29/47 were inspected while tuning; 101-108 are held out and included in the default eval run.
+- [real fixtures] Action verbs use window title + digest *headings* only; digest body (code, email text) and button labels ("Export", "Compose" always on screen) produced false verbs. Labels are also dropped from `digestText`.
+- [real fixtures] Findings need >= 2 distinct apps (`minPathApps`): single-app loops (inbox read/compose, coding) are ordinary work, not cross-tool workflows.
+- [real fixtures] Meetings (app category `meetings`) are hard episode boundaries: a call can trigger a workflow but its time is not workflow time.
+- [real fixtures] Focus blocks: a same-app run >= 10 min spanning >= 2 documents. Leaving or entering one needs clear text carry-over (centered cos >= 0.4) or a copy made on a short (< 10 min) hand-off visit just before; habits and copies out of the block do not count. Single-document long steps are not blocks.
+- [real fixtures] Restart (= next repetition) requires the same first-step action on a new item; "same item" = title word Jaccard >= 0.6 (returning to the same PR is not a restart).
+- [real fixtures] Different-document-in-same-app compares against all of that app's sessions in the task, and goes through the detour check before splitting.
+- [real fixtures] Clipboard carry only from the immediately previous step and within 2 min (was: any copy in the task within 5 min).
+- [real fixtures] Habit lift >= 3 (was 2).
+- [real fixtures] Session text vectors are centered on the audit mean before segmentation comparisons (company/user names in every title).
+- [real fixtures] Detours stay excluded from the episode (time, path, topic); `keepDetourTime` exists but is off: including them hurt overlap on fixtures and did not fix the calendar-step miss.
+- [real fixtures] Tuned on bookkeeper/ops_manager/freelancer; agency_am/founder held out and checked twice (87.5/87.5, then 62.5/75 after an overfit round); final round used all 5. Recorded in EVAL.md.
+- `eval --write` writes EVAL.latest.md (untracked); EVAL.md is curated by hand because it carries the tuning history.
