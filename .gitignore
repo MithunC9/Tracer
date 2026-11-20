@@ -17,3 +17,6 @@ apps/agent/src-tauri/gen/
 .claude/worktrees/
 packages/fixtures/data/*/raw.jsonl
 packages/fixtures/data/hostile-corpus.json
+
+# local dev state (device tokens for the simulated agents)
+.tracer/

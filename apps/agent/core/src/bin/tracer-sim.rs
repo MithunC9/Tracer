@@ -53,7 +53,8 @@ struct Args {
     speed: f64,
 
     /// Move timestamps to now. Speed 0: shift by whole days so the replay ends today (time
-    /// of day preserved). Speed > 0: the first sample happens now.
+    /// of day preserved). Speed > 0: the first sample happens now and timestamps are
+    /// compressed by the speed, so they follow the wall clock.
     #[arg(long)]
     time_shift_to_now: bool,
 

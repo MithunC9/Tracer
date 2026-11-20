@@ -17,7 +17,7 @@ One line each, newest at the bottom.
 - While an excluded window is frontmost, all ax/clipboard samples are dropped (not only those of the excluded app); idle events still pass (no app details).
 - The macOS source also honours exclusions before collecting AX text (via `CaptureSource::set_exclusions`), and is not polled at all unless the agent is capturing.
 - AX digest reads static text, headings and control labels only; never values of editable fields (that would be typed text) and never secure fields.
-- Simulated time shift: speed 0 shifts by whole days so the replay ends on/before now (time of day preserved); speed > 0 starts the replay now. Recorded spacing is kept in timestamps at any speed.
+- Simulated time shift: speed 0 shifts by whole days so the replay ends on/before now (time of day preserved); speed > 0 starts the replay now and compresses timestamps by the speed (integration: keeping recorded spacing at 60x stamped events up to hours ahead of the wall clock, which the API rejects as `future_timestamp`).
 - Auto-stop is fail-closed: `captureAllowed: false` from ingest triggers a config fetch; if that fails or says not paused, auto-stop. Restart only for a different auditId.
 - Sent events are kept until the end of their local day for the "what left this device today" view; "today" is by event timestamp in local time.
 - 413/400/422 split the batch in half; a single-event batch that is still refused is marked rejected locally so it cannot block the queue.

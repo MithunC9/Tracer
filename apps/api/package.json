@@ -13,7 +13,10 @@
     "migrate": "tsx --env-file-if-exists=../../.env src/scripts/migrate.ts",
     "seed": "tsx --env-file-if-exists=../../.env src/scripts/seed.ts",
     "db:generate": "drizzle-kit generate",
-    "load": "k6 run load/ingest.k6.js"
+    "load": "k6 run load/ingest.k6.js",
+    "test:e2e": "vitest run --project e2e",
+    "live-agent": "tsx --env-file-if-exists=../../.env src/scripts/live-agent.ts",
+    "verify:reports": "tsx --env-file-if-exists=../../.env src/scripts/verify-reports.ts"
   },
   "dependencies": {
     "@fastify/cookie": "^11.1.5",

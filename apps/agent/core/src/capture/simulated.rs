@@ -18,7 +18,10 @@ pub enum TimeShift {
     /// Move the recording to "now":
     /// - with speed 0 (backfill): shift by whole days so the last sample lands on or before
     ///   now, as late as possible. Time of day is preserved, so "9am" stays 9am.
-    /// - with speed > 0 (live replay): shift so the first sample is now.
+    /// - with speed > 0 (live replay): the first sample is now and timestamps are compressed
+    ///   by the speed (a sample recorded 60 min after the first, replayed at 60x, is stamped
+    ///   and delivered 1 min after now). Timestamps then track the wall clock, so the server
+    ///   never sees events from the future.
     ToNow,
 }
 
@@ -43,6 +46,9 @@ pub struct SimulatedSource {
     opts: SimulatedOptions,
     started: Option<Instant>,
     shift: chrono::Duration,
+    /// Divisor from recorded offsets to wall-clock pacing: the speed, or 1 once timestamps
+    /// have been compressed by it (live `ToNow`).
+    pace: f64,
 }
 
 impl SimulatedSource {
@@ -78,12 +84,22 @@ impl SimulatedSource {
             }
             _ => chrono::Duration::zero(),
         };
-        if !shift.is_zero() {
+        let mut pace = opts.speed;
+        if opts.time_shift == TimeShift::ToNow && opts.speed > 0.0 && opts.speed != 1.0 {
+            if let Some(first) = samples.first().map(RawSample::t) {
+                for s in &mut samples {
+                    let offset_ms = (s.t() - first).num_milliseconds() as f64;
+                    let scaled = chrono::Duration::milliseconds((offset_ms / opts.speed).round() as i64);
+                    s.shift((now + scaled) - s.t());
+                }
+                pace = 1.0;
+            }
+        } else if !shift.is_zero() {
             for s in &mut samples {
                 s.shift(shift);
             }
         }
-        SimulatedSource { samples, pos: 0, opts, started: None, shift }
+        SimulatedSource { samples, pos: 0, opts, started: None, shift, pace }
     }
 
     pub fn len(&self) -> usize {
@@ -131,7 +147,7 @@ impl CaptureSource for SimulatedSource {
         let origin = self.samples[0].t();
         let due = |s: &RawSample| {
             let offset = (s.t() - origin).to_std().unwrap_or_default();
-            started + offset.div_f64(self.opts.speed)
+            started + offset.div_f64(self.pace)
         };
         let next_due = due(&self.samples[self.pos]);
         let now = Instant::now();
@@ -191,6 +207,19 @@ mod tests {
         let el = t0.elapsed();
         assert!(el >= Duration::from_millis(90), "1s at 10x is ~100ms, took {el:?}");
         assert!(matches!(src.next_samples(Duration::ZERO).unwrap(), SourcePoll::Exhausted));
+    }
+
+    #[test]
+    fn live_shift_compresses_timestamps_by_speed() {
+        let now = DateTime::parse_from_rfc3339("2026-11-20T13:00:00Z").unwrap().with_timezone(&Utc);
+        let src = SimulatedSource::from_samples(
+            vec![s("2026-03-01T09:00:00Z"), s("2026-03-01T10:00:00Z")],
+            SimulatedOptions { speed: 60.0, time_shift: TimeShift::ToNow, chunk: 10 },
+            now,
+        );
+        // 1 h recorded at 60x is stamped (and delivered) 1 min after now: never in the future.
+        assert_eq!(src.first_ts().unwrap().to_rfc3339(), "2026-11-20T13:00:00+00:00");
+        assert_eq!(src.last_ts().unwrap().to_rfc3339(), "2026-11-20T13:01:00+00:00");
     }
 
     #[test]

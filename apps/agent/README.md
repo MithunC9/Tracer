@@ -77,7 +77,7 @@ $SIM --api http://localhost:4000 --device-token-file .tracer/device-token \
 | `--device-token-file F` | Read the device token; with `--pair-code`, write it (mode 0600). |
 | `--device-name NAME` | Sent when pairing (default `tracer-sim`). |
 | `--speed 0\|N` | 0 = as fast as possible (default); N = N× real time. |
-| `--time-shift-to-now` | Speed 0: shift by whole days so the replay ends today, time of day kept. Speed > 0: first sample = now. |
+| `--time-shift-to-now` | Speed 0: shift by whole days so the replay ends today, time of day kept. Speed > 0: first sample = now, timestamps compressed by the speed (they follow the wall clock). |
 | `--data-dir DIR` | Buffer + secrets dir; default is a temp dir removed on exit. Reuse it to resume an interrupted upload. |
 | `--dry-run --out FILE\|-` | Write the ActivityEvents that would be sent (JSON array), contact nothing. |
 | `--exclusions FILE` | Exclusions JSON for dry-run (the server's list wins when online). |
