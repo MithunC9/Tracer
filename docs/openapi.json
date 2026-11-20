@@ -5073,6 +5073,17 @@
                         },
                         "unit": {
                           "type": "string"
+                        },
+                        "kind": {
+                          "type": "string",
+                          "enum": [
+                            "finding",
+                            "total",
+                            "note"
+                          ]
+                        },
+                        "findingId": {
+                          "type": "string"
                         }
                       },
                       "required": [
@@ -5553,7 +5564,8 @@
                                   "budget",
                                   "skill",
                                   "effort",
-                                  "open_source"
+                                  "open_source",
+                                  "determinism"
                                 ]
                               },
                               "delta": {

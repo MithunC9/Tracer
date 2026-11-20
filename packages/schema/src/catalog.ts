@@ -133,7 +133,7 @@ export const DEFAULT_CONSTRAINTS: UserConstraints = {
 };
 
 export const FitReason = z.object({
-  factor: z.enum(['capability', 'integration', 'platform', 'budget', 'skill', 'effort', 'open_source']),
+  factor: z.enum(['capability', 'integration', 'platform', 'budget', 'skill', 'effort', 'open_source', 'determinism']),
   /** Signed contribution to fit score, for transparency. */
   delta: z.number(),
   note: z.string(),

@@ -95,6 +95,14 @@ export function reclaimableHours(weekly: number, ap: number): number {
 
 /** Calculation steps rendered verbatim by the web app's "how we got this number" panel. */
 export const CalcStep = z
-  .object({ label: z.string(), expression: z.string(), value: z.number(), unit: z.string() })
+  .object({
+    label: z.string(),
+    expression: z.string(),
+    value: z.number(),
+    unit: z.string(),
+    /** Convention: one 'finding' step per finding in rank order, then one 'total' step. */
+    kind: z.enum(['finding', 'total', 'note']).optional(),
+    findingId: z.string().optional(),
+  })
   .meta({ id: 'CalcStep' });
 export type CalcStep = z.infer<typeof CalcStep>;
