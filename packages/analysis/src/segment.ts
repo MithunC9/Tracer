@@ -28,6 +28,8 @@ interface Ep {
   centroid: number[];
   start: number;
   lastEnd: number;
+  /** End of the last session in this episode that copied something (-inf if none). */
+  lastCopyEnd: number;
   day: number;
 }
 
@@ -48,6 +50,8 @@ export function habitTransitions(items: readonly { appKey: string; start: number
   const count = new Map<string, number>();
   const days = new Map<string, Set<number>>();
   const out = new Map<string, number>();
+  const inn = new Map<string, number>();
+  let total = 0;
   let prev: (typeof items)[number] | null = null;
   for (const it of items) {
     if (it.seconds < cfg.minStepSeconds) continue;
@@ -57,13 +61,18 @@ export function habitTransitions(items: readonly { appKey: string; start: number
       if (!days.has(k)) days.set(k, new Set());
       days.get(k)!.add(it.day);
       out.set(prev.appKey, (out.get(prev.appKey) ?? 0) + 1);
+      inn.set(it.appKey, (inn.get(it.appKey) ?? 0) + 1);
+      total++;
     }
     prev = it;
   }
   const habits = new Set<string>();
   for (const [k, c] of count) {
-    const from = k.split('>')[0]!;
-    if (c >= cfg.habitMinCount && (days.get(k)?.size ?? 0) >= cfg.habitMinDays && c / (out.get(from) ?? 1) >= cfg.habitMinShare) habits.add(k);
+    const [from, to] = k.split('>') as [string, string];
+    const share = c / (out.get(from) ?? 1);
+    // lift: hub apps everyone switches to (chat, email) do not count as a specific hand-off
+    const lift = share / ((inn.get(to) ?? 1) / Math.max(1, total));
+    if (c >= cfg.habitMinCount && (days.get(k)?.size ?? 0) >= cfg.habitMinDays && share >= cfg.habitMinShare && lift >= 2) habits.add(k);
   }
   return habits;
 }
@@ -108,7 +117,7 @@ export function segmentTasks(sessions: readonly FocusSession[], opts: SegmentOpt
   const episodes: Ep[] = [];
   let cur: Ep | null = null;
   const startEp = (x: S): Ep => {
-    const ep: Ep = { items: [], apps: new Set(), windows: new Set(), centroid: new Array<number>(x.vec.length).fill(0), start: x.start, lastEnd: x.end, day: x.day };
+    const ep: Ep = { items: [], apps: new Set(), windows: new Set(), centroid: new Array<number>(x.vec.length).fill(0), start: x.start, lastEnd: x.end, lastCopyEnd: Number.NEGATIVE_INFINITY, day: x.day };
     episodes.push(ep);
     add(ep, x);
     return ep;
@@ -119,18 +128,45 @@ export function segmentTasks(sessions: readonly FocusSession[], opts: SegmentOpt
     ep.windows.add(windowKey(x.s));
     addScaled(ep.centroid, x.vec, Math.log(2 + Math.min(x.s.activeSeconds, 1800) / 30));
     ep.lastEnd = Math.max(ep.lastEnd, x.end);
+    if (x.s.clipboardEvents > 0) ep.lastCopyEnd = x.end;
   };
-  /** Does the run starting at i return to the episode soon? Returns the index of the return, or -1. */
-  const interruptionReturn = (ep: Ep, i: number): number => {
+  /**
+   * Does session y continue episode ep (whose last kept session is prev)?
+   * 'continue' / 'split' (a clear new instance or different document) / 'unknown'.
+   */
+  const judge = (ep: Ep, prev: S, y: S, allowClipboard: boolean): 'continue' | 'split' | 'unknown' => {
+    const simC = cosine(y.vec, ep.centroid);
+    if (ep.apps.has(y.s.appKey)) {
+      const newWindow = !ep.windows.has(windowKey(y.s));
+      const first = ep.items.find((z) => z.s.activeSeconds >= cfg.minStepSeconds) ?? ep.items[0]!;
+      // Back at the first step with a new document after visiting other apps: the next instance has started.
+      const restart =
+        newWindow && ep.apps.size >= 2 && y.s.appKey === first.s.appKey && y.s.action === first.s.action && y.s.activeSeconds >= cfg.minStepSeconds && prev.s.appKey !== y.s.appKey;
+      const differentDoc =
+        newWindow &&
+        y.s.appKey === prev.s.appKey &&
+        cosine(y.vec, prev.vec) < cfg.sameAppSplitSimilarity &&
+        y.s.activeSeconds >= 60 &&
+        prev.s.clipboardEvents === 0;
+      return restart || differentDoc ? 'split' : 'continue';
+    }
+    if (simC >= cfg.topicContinueSimilarity) return 'continue';
+    if (habits.has(`${prev.s.appKey}>${y.s.appKey}`)) return 'continue';
+    // something was copied in this task moments ago: carrying data to the next app
+    if (allowClipboard && y.start - ep.lastCopyEnd < 5 * 60_000) return 'continue';
+    return 'unknown';
+  };
+  /** A short foreign run starting at i, after which the task visibly continues: index of the continuation, or -1. */
+  const interruptionEnd = (ep: Ep, prev: S, i: number): number => {
     let dur = 0;
-    for (let k = i; k < items.length && k < i + cfg.interruptionMaxSessions + 1; k++) {
+    for (let k = i; k < items.length && k <= i + cfg.interruptionMaxSessions; k++) {
       const y = items[k]!;
       if (k > i) {
-        const gap = y.start - items[k - 1]!.end;
-        if (gap > cfg.episodeGapSeconds * 1000) return -1;
-        const returns = ep.windows.has(windowKey(y.s)) || (ep.apps.has(y.s.appKey) && cosine(y.vec, ep.centroid) >= cfg.topicContinueSimilarity);
-        if (returns) return k;
+        if (y.start - items[k - 1]!.end > cfg.episodeGapSeconds * 1000) return -1;
+        if (y.s.activeSeconds >= cfg.minStepSeconds && judge(ep, prev, y, true) === 'continue') return k;
       }
+      // copying data is task work, not an interruption
+      if (y.s.clipboardEvents > 0) return -1;
       dur += y.s.activeSeconds;
       if (dur > cfg.interruptionMaxSeconds) return -1;
     }
@@ -149,39 +185,26 @@ export function segmentTasks(sessions: readonly FocusSession[], opts: SegmentOpt
       cur = startEp(x);
       continue;
     }
-    const simC = cosine(x.vec, cur.centroid);
-    let cont = false;
-    if (cur.apps.has(x.s.appKey)) {
-      const differentDoc =
-        x.s.appKey === prev.s.appKey &&
-        x.s.windowTitle !== prev.s.windowTitle &&
-        !cur.windows.has(windowKey(x.s)) &&
-        cosine(x.vec, prev.vec) < cfg.sameAppSplitSimilarity &&
-        simC < cfg.topicContinueSimilarity &&
-        x.s.activeSeconds >= 60 &&
-        prev.s.clipboardEvents === 0;
-      cont = !differentDoc;
-    } else if (prev.s.clipboardEvents > 0) {
-      cont = true;
-    } else if (simC >= cfg.topicContinueSimilarity) {
-      cont = true;
-    } else if (habits.has(`${prev.s.appKey}>${x.s.appKey}`)) {
-      cont = true;
-    } else {
-      const k = interruptionReturn(cur, i);
-      if (k > i) {
-        // drop the interruption run, continue with the return
-        i = k - 1;
-        continue;
-      }
-      if (x.s.activeSeconds < cfg.minStepSeconds) {
-        // too short to judge: passing through
-        continue;
-      }
+    const j = judge(cur, prev, x, false);
+    if (j === 'continue') {
+      add(cur, x);
+      continue;
     }
-    if (cont) add(cur, x);
+    if (j === 'split') {
+      cur = startEp(x);
+      continue;
+    }
+    const k = interruptionEnd(cur, prev, i);
+    if (k > i) {
+      // drop the interruption run; resume at the continuation
+      i = k - 1;
+      continue;
+    }
+    if (judge(cur, prev, x, true) === 'continue') add(cur, x);
+    else if (x.s.activeSeconds < cfg.minStepSeconds) continue; // too short to judge: passing through
     else cur = startEp(x);
   }
+
 
   const out: TaskEpisode[] = [];
   for (const ep of episodes) {

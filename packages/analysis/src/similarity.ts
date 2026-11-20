@@ -50,9 +50,34 @@ export function appShareSimilarity(a: readonly Tok[], b: readonly Tok[]): number
 }
 
 /** Episode similarity = weighted sum of sequence, app-share and text similarity (all 0..1). */
-export function episodeSimilarity(a: TaskEpisode, b: TaskEpisode, w: AnalysisConfig['simWeights']): number {
+export function episodeSimilarity(
+  a: TaskEpisode,
+  b: TaskEpisode,
+  w: AnalysisConfig['simWeights'],
+  textA: readonly number[] | undefined = a.embedding,
+  textB: readonly number[] | undefined = b.embedding,
+): number {
   const seq = sequenceSimilarity(a.path, b.path);
   const app = appShareSimilarity(a.path, b.path);
-  const txt = Math.max(0, cosine(a.embedding, b.embedding));
+  const txt = Math.max(0, cosine(textA, textB));
   return w.sequence * seq + w.appShare * app + w.text * txt;
+}
+
+/**
+ * Remove the component shared by all episodes (mean embedding) and re-normalize. Words that
+ * appear everywhere ("inbox", "search results", app chrome) stop making unrelated tasks look
+ * alike; this plays the role IDF weighting plays for sparse text.
+ */
+export function centerEmbeddings(vectors: readonly (readonly number[] | undefined)[]): (number[] | undefined)[] {
+  const present = vectors.filter((v): v is readonly number[] => !!v && v.length > 0);
+  if (present.length < 3) return vectors.map((v) => (v ? [...v] : undefined));
+  const dims = present[0]!.length;
+  const m = new Array<number>(dims).fill(0);
+  for (const v of present) for (let i = 0; i < dims; i++) m[i]! += (v[i] ?? 0) / present.length;
+  return vectors.map((v) => {
+    if (!v || v.length !== dims) return undefined;
+    const c = v.map((x, i) => x - m[i]!);
+    const n = Math.sqrt(c.reduce((a, x) => a + x * x, 0));
+    return n > 0 ? c.map((x) => x / n) : c;
+  });
 }

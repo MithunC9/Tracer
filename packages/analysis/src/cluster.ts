@@ -2,7 +2,8 @@ import { SCORING, type PathStep, type TaskEpisode, type WorkflowCluster } from '
 import { appName } from './apps.js';
 import { DEFAULT_CONFIG, type AnalysisConfig } from './config.js';
 import { deriveRequirements } from './requirements.js';
-import { episodeSimilarity } from './similarity.js';
+import { centerEmbeddings, episodeSimilarity } from './similarity.js';
+import { cosine } from './text.js';
 import { clamp01, r1, sha256Hex, toMs } from './util.js';
 
 /** Verbs that only consume information. A path made only of these has nothing to automate. */
@@ -136,10 +137,11 @@ export function clusterWorkflows(episodes: readonly TaskEpisode[], opts: Cluster
   const n = eps.length;
   if (n === 0) return [];
   const sim = new Float64Array(n * n);
+  const text = centerEmbeddings(eps.map((e) => e.embedding));
   for (let i = 0; i < n; i++) {
     sim[i * n + i] = 1;
     for (let j = i + 1; j < n; j++) {
-      const v = episodeSimilarity(eps[i]!, eps[j]!, cfg.simWeights);
+      const v = episodeSimilarity(eps[i]!, eps[j]!, cfg.simWeights, text[i], text[j]);
       sim[i * n + j] = v;
       sim[j * n + i] = v;
     }
@@ -167,6 +169,14 @@ export function clusterWorkflows(episodes: readonly TaskEpisode[], opts: Cluster
       pairs += g.length - 1;
     }
     const cohesion = clamp01(pairs ? pairSum / pairs : 1);
+    let tSum = 0;
+    let tN = 0;
+    for (let a = 0; a < g.length; a++)
+      for (let b = a + 1; b < g.length; b++) {
+        tSum += cosine(text[g[a]!], text[g[b]!]);
+        tN++;
+      }
+    if (tN && tSum / tN < cfg.minTextCohesion) continue;
     const canonicalPath = consensusPath(eps[medoid]!.path, members, cfg.consensusSupport, cfg.maxPathSteps);
     const distinct = new Set(canonicalPath.map((s) => `${s.appKey}:${s.action}`)).size;
     if (distinct < cfg.minPathSteps) continue;

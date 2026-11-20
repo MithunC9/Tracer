@@ -28,7 +28,7 @@ const CATEGORY_DEFAULT: Partial<Record<AppCategory, ActionVerb>> = {
   docs: 'edit',
   crm: 'edit',
   accounting: 'edit',
-  calendar: 'schedule',
+  calendar: 'read',
   meetings: 'read',
   design: 'edit',
   coding: 'edit',

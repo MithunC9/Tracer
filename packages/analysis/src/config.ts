@@ -52,6 +52,12 @@ export interface AnalysisConfig {
   consensusSupport: number;
   /** Max steps in a canonical path. */
   maxPathSteps: number;
+  /**
+   * Min mean pairwise text similarity (centered embeddings) inside a cluster. Repeating the
+   * same work repeats its vocabulary (titles, on-screen labels); app sequences that recur with
+   * unrelated text are coincidences (e.g. writing different docs then searching the web).
+   */
+  minTextCohesion: number;
   /** Findings need at least this many distinct steps (single-step activity is not a workflow). */
   minPathSteps: number;
 
@@ -73,17 +79,18 @@ export const DEFAULT_CONFIG: AnalysisConfig = {
   interruptionMaxSeconds: 5 * 60,
   interruptionMaxSessions: 3,
   topicContinueSimilarity: 0.2,
-  sameAppSplitSimilarity: 0.05,
+  sameAppSplitSimilarity: 0.1,
   habitMinDays: 2,
   habitMinCount: 3,
   habitMinShare: 0.25,
   minStepSeconds: 10,
   minEpisodeSeconds: 90,
 
-  simWeights: { sequence: 0.4, appShare: 0.3, text: 0.3 },
-  clusterThreshold: 0.5,
+  simWeights: { sequence: 0.3, appShare: 0.2, text: 0.5 },
+  clusterThreshold: 0.55,
   consensusSupport: 0.5,
   maxPathSteps: 8,
+  minTextCohesion: 0.4,
   minPathSteps: 2,
 
   maxFindings: 10,

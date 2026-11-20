@@ -1,4 +1,4 @@
-import { LIMITS } from '@tracer/schema';
+import { APPS, LIMITS } from '@tracer/schema';
 import { fnv1a } from './util.js';
 
 /**
@@ -11,12 +11,17 @@ const STOPWORDS = new Set(
   (
     'a an and are as at be but by for from has have in into is it its of on or that the this to was were will with ' +
     'you your we our i me my he she they them their there here not no yes all any can do does did done so if then ' +
-    'than too very just about over under up down out off via per vs etc ' +
+    'than too very just about over under up down out off via per vs etc more new get got also one two ' +
     // UI chrome that carries no topic
     'google chrome safari firefox window tab tabs untitled page app web www com http https mozilla microsoft apple ' +
     'menu toolbar button click ok cancel close open file view help edit format tools insert data'
   ).split(/\s+/),
 );
+
+// App names and hosts say which app, not what the task is about; app identity is compared separately.
+for (const a of APPS) {
+  for (const w of `${a.name} ${a.key.replace(/_/g, ' ')} ${a.hosts.join(' ')}`.toLowerCase().split(/[^a-z0-9]+/)) if (w.length >= 2) STOPWORDS.add(w);
+}
 
 const REDACTED = /\[redacted:[a-z_]+\]/g;
 
