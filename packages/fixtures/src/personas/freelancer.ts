@@ -1,0 +1,230 @@
+import { axd, BROWSERS, nat, NATIVE, web, type PersonaDef } from '../engine.js';
+import { emailFor, iban, money, personName, phoneIntl, secrets, stableDocId } from '../fake.js';
+import {
+  aiChat,
+  coffeeBreak,
+  dur,
+  emailPeek,
+  emailTriage,
+  gmailCompose,
+  gmailInbox,
+  gmailThread,
+  messagesPing,
+  passwordThenLogin,
+  personalBanking,
+  privateBrowsing,
+  readNews,
+  slackChat,
+  slackPing,
+  slackScreen,
+  spotify,
+  youtube,
+  zoomScreen,
+} from './common.js';
+import { figmaWork, terminalWork, vscodeWork } from './deepwork.js';
+
+const CLIENTS = ['Nordlicht GmbH', 'Kite Analytics', 'Ferro Studio', 'Bluefin Labs'];
+const SLACK_ORG = 'Kite Analytics';
+
+export const freelancer: PersonaDef = {
+  id: 'freelancer',
+  description:
+    'Maya, freelance product designer and front-end developer with four retainer clients (Berlin, UTC+1). Deep work in Figma and VS Code; invoices from Toggl into Xero; uses Arc.',
+  tzOffsetHours: 1,
+  browser: BROWSERS.arc,
+  me: { name: 'Maya Krüger', email: 'maya@studio-kraft.de', domain: 'studio-kraft.de' },
+  workflows: [
+    {
+      id: 'wf_invoice_from_toggl',
+      label: 'Toggl hours → create invoice in Xero → email PDF to client',
+      interruptP: 0.25,
+      vars: (c) => ({ client: c.r.pick(CLIENTS), contact: personName(c.r), hours: String(c.r.int(6, 38)), inv: `INV-${c.r.int(1040, 1099)}` }),
+      steps: [
+        {
+          appKey: 'other:toggl-track',
+          action: 'review',
+          label: 'Review tracked hours in Toggl',
+          minutes: [2, 5],
+          clips: 1,
+          screens: (c) => [
+            nat(NATIVE.toggl, 'Toggl Track — Reports', [axd(['Summary report', c.v.client!], ['This week', 'Last month', 'Export'], `${c.v.client}: ${c.v.hours}h 15m billable. Design system, sprint QA.`)]),
+          ],
+        },
+        {
+          appKey: 'xero',
+          action: 'compose',
+          label: 'Create the invoice in Xero',
+          minutes: [4, 10],
+          screens: (c) => [
+            web(c, `https://go.xero.com/app/!kT4p/invoicing/edit/${c.r.digits(8)}`, `New Invoice | Xero`, [
+              axd(['New invoice', c.v.inv!], ['Contact', 'Issue date', 'Due date', 'Item', 'Quantity', 'Price', 'Approve'], `${c.v.client}  ${c.v.hours} h x €95.00  Total €${money(c.r, 600, 3800)}\nPay to IBAN ${c.sim.plant(iban(c.r, 'DE'))}`),
+            ]),
+          ],
+        },
+        {
+          appKey: 'xero',
+          action: 'download',
+          label: 'Approve and download PDF',
+          minutes: [1, 2.5],
+          clipKind: 'file',
+          screens: (c) => [web(c, `https://go.xero.com/app/!kT4p/invoicing/view/${c.r.digits(8)}`, `${c.v.inv} | Xero`, [axd([c.v.inv!], ['Print PDF', 'Send', 'Copy link'], 'Awaiting payment')])],
+        },
+        {
+          appKey: 'gmail',
+          action: 'compose',
+          label: 'Email the invoice PDF to the client',
+          minutes: [1.5, 4],
+          screens: (c) => [gmailCompose(c, c.sim.plant(emailFor(c.r, c.v.contact!, c.v.client!.toLowerCase().replace(/\W+/g, '') + '.com')), `${c.v.inv} – ${c.v.client}`, `Hi ${c.v.contact}, invoice attached for October. Danke!`)],
+        },
+      ],
+    },
+    {
+      id: 'wf_design_handoff',
+      label: 'Export frames from Figma → upload to Google Drive → share link in Slack',
+      interruptP: 0.2,
+      vars: (c) => ({ file: c.r.pick(['Kite – Dashboard v4', 'Nordlicht – Onboarding', 'Ferro – Marketing site']) }),
+      steps: [
+        {
+          appKey: 'figma',
+          action: 'export',
+          label: 'Export frames as PNG/PDF',
+          minutes: [3, 8],
+          screens: (c) => [nat(NATIVE.figma, `${c.v.file} – Figma`, [axd(['Export'], ['Export', '2x', 'PNG', 'PDF'], `Export ${c.r.int(3, 18)} layers`)])],
+        },
+        {
+          appKey: 'google_drive',
+          action: 'upload',
+          label: 'Upload exports to the client folder',
+          minutes: [2, 4],
+          clips: 1,
+          screens: (c) => [web(c, `https://drive.google.com/drive/folders/${stableDocId('fl:' + c.v.file)}`, `${c.v.file!.split(' – ')[0]} handoff - Google Drive`, [axd(['Handoff'], ['New', 'Upload files', 'Share', 'Copy link'], 'Uploading 12 items… Done')])],
+        },
+        {
+          appKey: 'slack',
+          action: 'compose',
+          label: 'Post the link in the client channel',
+          minutes: [1, 3],
+          screens: (c) => [slackScreen(c, SLACK_ORG, '#design-handoff', `Maya Krüger: New exports for ${c.v.file} are in the Drive folder. Specs in the frame notes.`)],
+        },
+      ],
+    },
+    {
+      id: 'wf_pr_review',
+      label: 'Review GitHub PR → test branch locally in the terminal → approve on GitHub',
+      interruptP: 0.15,
+      vars: (c) => ({ pr: String(c.r.int(380, 520)) }),
+      steps: [
+        {
+          appKey: 'github',
+          action: 'review',
+          label: 'Read the PR diff',
+          minutes: [4, 11],
+          screens: (c) => [web(c, `https://github.com/kite-analytics/web/pull/${c.v.pr}/files`, `Fix chart tooltip overflow by tkowalski · Pull Request #${c.v.pr} · kite-analytics/web`, [axd(['Files changed'], ['Review changes', 'Viewed', 'Comment'], `src/components/Tooltip.tsx +42 −17`)])],
+        },
+        {
+          appKey: 'terminal',
+          action: 'review',
+          label: 'Check out and run the branch',
+          minutes: [3, 9],
+          skipP: 0.3,
+          screens: (c) => [nat(NATIVE.iterm, 'zsh — kite-web', [axd(['zsh — kite-web'], ['Shell'], `$ gh pr checkout ${c.v.pr}\n$ pnpm dev\nready on port 5173`)])],
+        },
+        {
+          appKey: 'github',
+          action: 'approve',
+          label: 'Approve with comments',
+          minutes: [1, 3],
+          screens: (c) => [web(c, `https://github.com/kite-analytics/web/pull/${c.v.pr}`, `Fix chart tooltip overflow · Pull Request #${c.v.pr} · kite-analytics/web`, [axd(['Conversation'], ['Approve', 'Request changes', 'Submit review'], 'LGTM, one nit on spacing.')])],
+        },
+      ],
+    },
+    {
+      id: 'wf_feedback_to_issues',
+      label: 'Client feedback email → create Linear issues → reply to client',
+      interruptP: 0.25,
+      vars: (c) => ({ client: c.r.pick(CLIENTS), contact: personName(c.r) }),
+      steps: [
+        {
+          appKey: 'gmail',
+          action: 'read',
+          label: 'Read the feedback email',
+          minutes: [2, 5],
+          clips: 2,
+          screens: (c) => [
+            gmailThread(c, `Feedback on latest designs – ${c.v.client}`, `${c.v.contact} <${c.sim.plant(emailFor(c.r, c.v.contact!, 'nordlicht.de'))}>`, `1. Logo too small on mobile. 2. Can we try the darker blue? 3. Footer links broken.\n${c.v.contact} · ${c.sim.plant(phoneIntl(c.r, 'DE'))}`),
+          ],
+        },
+        {
+          appKey: 'linear',
+          action: 'compose',
+          label: 'Create issues in Linear',
+          minutes: [4, 10],
+          screens: (c) => [nat(NATIVE.linear, `New issue – ${c.v.client}`, [axd(['New issue'], ['Title', 'Description', 'Labels', 'Create issue'], `Mobile logo size; Darker primary blue; Footer links`)])],
+        },
+        {
+          appKey: 'gmail',
+          action: 'compose',
+          label: 'Reply confirming next steps',
+          minutes: [2, 4],
+          screens: (c) => [gmailCompose(c, c.v.contact!, `Re: Feedback on latest designs – ${c.v.client}`, 'Thanks! Logged all three, updated designs Thursday.')],
+        },
+      ],
+    },
+  ],
+  schedule: {
+    wf_invoice_from_toggl: [[0, 16.0], [1, 16.3], [3, 15.8], [4, 14.5]],
+    wf_design_handoff: [[0, 12.0], [1, 11.6], [2, 15.2], [3, 11.8], [4, 11.0]],
+    wf_pr_review: [[0, 9.5], [1, 14.0], [2, 9.4], [3, 9.6], [3, 16.6], [4, 9.5]],
+    wf_feedback_to_issues: [[0, 14.2], [1, 9.2], [2, 13.4], [3, 13.7], [4, 15.6]],
+  },
+  meetings: [
+    { day: 0, at: 10.5, minutes: 30, title: 'Kite Analytics design review' },
+    { day: 2, at: 11.0, minutes: 45, title: 'Nordlicht sprint planning' },
+    { day: 3, at: 14.6, minutes: 30, title: 'Ferro Studio kickoff' },
+  ],
+  days: [
+    { start: 9.0, end: 17.6, lunch: [13.0, 45] },
+    { start: 8.8, end: 17.4, lunch: [12.8, 50] },
+    { start: 9.1, end: 16.4, lunch: [12.5, 60] },
+    { start: 9.0, end: 17.5, lunch: [13.1, 40] },
+    { start: 9.2, end: 16.6, lunch: [12.9, 45] },
+    { start: 11.0, end: 11.6 },
+    { start: 20.0, end: 20.5 },
+  ],
+  fillers: [
+    [figmaWork(['Kite – Dashboard v4', 'Nordlicht – Onboarding', 'Ferro – Marketing site', 'Personal – Portfolio 2027']), 4],
+    [
+      vscodeWork('kite-web', ['Tooltip.tsx', 'Chart.tsx', 'tailwind.config.ts', 'index.css', 'README.md'], [
+        (c) => `STRIPE_SECRET_KEY=${c.sim.plant(secrets.stripeLive(c.r))}`,
+        (c) => `AWS_ACCESS_KEY_ID=${c.sim.plant(secrets.awsKeyId(c.r))}`,
+        (c) => `AWS_SECRET_ACCESS_KEY=${c.sim.plant(secrets.awsSecret(c.r))}`,
+      ]),
+      3,
+    ],
+    [terminalWork('kite-web', [(c) => `$ git remote -v\norigin https://maya:${c.sim.plant(secrets.github(c.r))}@github.com/kite-analytics/web.git`]), 0.8],
+    [emailTriage, 1.5],
+    [slackChat(SLACK_ORG, ['#design', '#design-handoff', '#frontend', '#general']), 1.5],
+    [(c, budget) => c.sim.dwell(web(c, 'https://dribbble.com/shots/popular', 'Popular shots on Dribbble', [axd(['Popular'], ['Like'], 'Dashboard UI, onboarding illustrations')]), dur(c, budget, 120, 600), { axEvery: [30, 90] }), 0.7],
+    [(c, budget) => c.sim.dwell(nat(NATIVE.toggl, 'Toggl Track', [axd(['Timer'], ['Start', 'Stop'], `Timer 01:${c.r.int(10, 59)}:${c.r.int(10, 59)} — Kite design system`)]), dur(c, budget, 10, 40), { axEvery: [5, 15] }), 0.8],
+    [aiChat, 0.8],
+    [readNews, 0.6],
+    [youtube, 0.4],
+    [coffeeBreak, 1],
+    [personalBanking, 0.4],
+    [passwordThenLogin('https://login.xero.com/identity/user/login', 'Login | Xero'), 0.3],
+    [privateBrowsing, 0.25],
+  ],
+  interrupts: [emailPeek, slackPing(SLACK_ORG, ['#design', '#frontend']), messagesPing, spotify],
+  flicker: (c) => [nat(NATIVE.slack, null), gmailInbox(c), nat(NATIVE.spotify, 'Spotify Premium'), nat(NATIVE.finder, 'Exports')],
+  meetingScreen: zoomScreen,
+  distractors: [
+    'Long Figma design sessions (incl. personal portfolio)',
+    'VS Code development on kite-web; .env file with Stripe/AWS keys (must be redacted)',
+    'Terminal work; git remote with a GitHub token (must be redacted)',
+    'Toggl timer start/stop (same app as invoicing, not a workflow)',
+    'Zoom client meetings (Mon, Wed, Thu)',
+    'Dribbble inspiration, news, YouTube, AI assistant chats, Spotify flicker',
+    'Weekend: Saturday mail check, Sunday evening glance',
+    'Personal banking, private windows, 1Password → Xero login (excluded / secure field)',
+  ],
+};

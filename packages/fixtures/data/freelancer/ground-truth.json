@@ -1,0 +1,186 @@
+{
+  "persona": "freelancer",
+  "description": "Maya, freelance product designer and front-end developer with four retainer clients (Berlin, UTC+1). Deep work in Figma and VS Code; invoices from Toggl into Xero; uses Arc.",
+  "startsAt": "2026-11-01T23:00:00.000Z",
+  "days": 7,
+  "workflows": [
+    {
+      "id": "wf_invoice_from_toggl",
+      "label": "Toggl hours → create invoice in Xero → email PDF to client",
+      "path": [
+        {
+          "appKey": "other:toggl-track",
+          "action": "review"
+        },
+        {
+          "appKey": "xero",
+          "action": "compose"
+        },
+        {
+          "appKey": "xero",
+          "action": "download"
+        },
+        {
+          "appKey": "gmail",
+          "action": "compose"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T14:53:00.001Z",
+          "end": "2026-11-02T15:04:30.302Z"
+        },
+        {
+          "start": "2026-11-03T15:14:53.044Z",
+          "end": "2026-11-03T15:29:45.288Z"
+        },
+        {
+          "start": "2026-11-05T14:51:00.000Z",
+          "end": "2026-11-05T15:09:40.693Z"
+        },
+        {
+          "start": "2026-11-06T13:26:00.000Z",
+          "end": "2026-11-06T13:42:38.670Z"
+        }
+      ],
+      "minutesPerWeek": 61.7
+    },
+    {
+      "id": "wf_design_handoff",
+      "label": "Export frames from Figma → upload to Google Drive → share link in Slack",
+      "path": [
+        {
+          "appKey": "figma",
+          "action": "export"
+        },
+        {
+          "appKey": "google_drive",
+          "action": "upload"
+        },
+        {
+          "appKey": "slack",
+          "action": "compose"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T10:52:00.000Z",
+          "end": "2026-11-02T10:58:41.644Z"
+        },
+        {
+          "start": "2026-11-03T10:48:00.000Z",
+          "end": "2026-11-03T11:01:39.797Z"
+        },
+        {
+          "start": "2026-11-04T14:22:00.000Z",
+          "end": "2026-11-04T14:34:55.140Z"
+        },
+        {
+          "start": "2026-11-05T10:50:13.595Z",
+          "end": "2026-11-05T10:59:54.401Z"
+        },
+        {
+          "start": "2026-11-06T09:52:00.000Z",
+          "end": "2026-11-06T10:01:06.647Z"
+        }
+      ],
+      "minutesPerWeek": 52.1
+    },
+    {
+      "id": "wf_pr_review",
+      "label": "Review GitHub PR → test branch locally in the terminal → approve on GitHub",
+      "path": [
+        {
+          "appKey": "github",
+          "action": "review"
+        },
+        {
+          "appKey": "terminal",
+          "action": "review"
+        },
+        {
+          "appKey": "github",
+          "action": "approve"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T08:31:00.000Z",
+          "end": "2026-11-02T08:39:37.138Z"
+        },
+        {
+          "start": "2026-11-03T13:10:00.000Z",
+          "end": "2026-11-03T13:21:00.394Z"
+        },
+        {
+          "start": "2026-11-04T08:36:00.000Z",
+          "end": "2026-11-04T08:53:33.778Z"
+        },
+        {
+          "start": "2026-11-05T08:46:59.999Z",
+          "end": "2026-11-05T09:06:06.634Z"
+        },
+        {
+          "start": "2026-11-05T15:30:02.894Z",
+          "end": "2026-11-05T15:48:08.706Z"
+        },
+        {
+          "start": "2026-11-06T08:35:00.000Z",
+          "end": "2026-11-06T08:51:32.463Z"
+        }
+      ],
+      "minutesPerWeek": 90.9
+    },
+    {
+      "id": "wf_feedback_to_issues",
+      "label": "Client feedback email → create Linear issues → reply to client",
+      "path": [
+        {
+          "appKey": "gmail",
+          "action": "read"
+        },
+        {
+          "appKey": "linear",
+          "action": "compose"
+        },
+        {
+          "appKey": "gmail",
+          "action": "compose"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T13:07:00.000Z",
+          "end": "2026-11-02T13:22:13.859Z"
+        },
+        {
+          "start": "2026-11-03T08:00:00.000Z",
+          "end": "2026-11-03T08:17:25.730Z"
+        },
+        {
+          "start": "2026-11-04T12:40:35.000Z",
+          "end": "2026-11-04T12:54:46.625Z"
+        },
+        {
+          "start": "2026-11-05T12:36:15.999Z",
+          "end": "2026-11-05T12:48:33.844Z"
+        },
+        {
+          "start": "2026-11-06T14:40:00.001Z",
+          "end": "2026-11-06T14:54:12.369Z"
+        }
+      ],
+      "minutesPerWeek": 73.4
+    }
+  ],
+  "distractors": [
+    "Long Figma design sessions (incl. personal portfolio)",
+    "VS Code development on kite-web; .env file with Stripe/AWS keys (must be redacted)",
+    "Terminal work; git remote with a GitHub token (must be redacted)",
+    "Toggl timer start/stop (same app as invoicing, not a workflow)",
+    "Zoom client meetings (Mon, Wed, Thu)",
+    "Dribbble inspiration, news, YouTube, AI assistant chats, Spotify flicker",
+    "Weekend: Saturday mail check, Sunday evening glance",
+    "Personal banking, private windows, 1Password → Xero login (excluded / secure field)"
+  ]
+}

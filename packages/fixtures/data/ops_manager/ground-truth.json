@@ -1,0 +1,230 @@
+{
+  "persona": "ops_manager",
+  "description": "Jordan, operations manager at a 15-person DTC outdoor-gear brand (Chicago, UTC-6). Lives in Zendesk, Shopify admin, Google Sheets, Slack and Gmail.",
+  "startsAt": "2026-11-02T06:00:00.000Z",
+  "days": 7,
+  "workflows": [
+    {
+      "id": "wf_ticket_order_lookup",
+      "label": "Zendesk ticket → look up the order in Shopify → reply with a macro",
+      "path": [
+        {
+          "appKey": "zendesk",
+          "action": "read"
+        },
+        {
+          "appKey": "shopify",
+          "action": "search"
+        },
+        {
+          "appKey": "shopify",
+          "action": "review"
+        },
+        {
+          "appKey": "zendesk",
+          "action": "compose"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T16:23:24.319Z",
+          "end": "2026-11-02T16:34:28.264Z"
+        },
+        {
+          "start": "2026-11-02T19:33:00.000Z",
+          "end": "2026-11-02T19:44:15.084Z"
+        },
+        {
+          "start": "2026-11-02T21:43:50.444Z",
+          "end": "2026-11-02T21:51:35.127Z"
+        },
+        {
+          "start": "2026-11-03T15:46:23.093Z",
+          "end": "2026-11-03T15:57:40.239Z"
+        },
+        {
+          "start": "2026-11-03T19:55:37.305Z",
+          "end": "2026-11-03T20:05:24.319Z"
+        },
+        {
+          "start": "2026-11-04T16:24:21.501Z",
+          "end": "2026-11-04T16:33:46.696Z"
+        },
+        {
+          "start": "2026-11-04T19:19:00.000Z",
+          "end": "2026-11-04T19:29:32.088Z"
+        },
+        {
+          "start": "2026-11-04T21:35:00.000Z",
+          "end": "2026-11-04T21:44:46.914Z"
+        },
+        {
+          "start": "2026-11-05T15:44:21.000Z",
+          "end": "2026-11-05T15:54:39.658Z"
+        },
+        {
+          "start": "2026-11-05T21:03:12.084Z",
+          "end": "2026-11-05T21:13:08.529Z"
+        },
+        {
+          "start": "2026-11-06T16:18:41.470Z",
+          "end": "2026-11-06T16:27:12.591Z"
+        },
+        {
+          "start": "2026-11-06T19:28:00.000Z",
+          "end": "2026-11-06T19:37:39.796Z"
+        },
+        {
+          "start": "2026-11-06T21:00:00.000Z",
+          "end": "2026-11-06T21:10:02.902Z"
+        },
+        {
+          "start": "2026-11-07T17:07:00.000Z",
+          "end": "2026-11-07T17:15:30.531Z"
+        }
+      ],
+      "minutesPerWeek": 137.9
+    },
+    {
+      "id": "wf_inventory_reorder",
+      "label": "Export inventory from Shopify → update reorder sheet → email supplier PO",
+      "path": [
+        {
+          "appKey": "shopify",
+          "action": "export"
+        },
+        {
+          "appKey": "google_sheets",
+          "action": "import"
+        },
+        {
+          "appKey": "google_sheets",
+          "action": "edit"
+        },
+        {
+          "appKey": "gmail",
+          "action": "compose"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T20:09:16.163Z",
+          "end": "2026-11-02T20:25:44.295Z"
+        },
+        {
+          "start": "2026-11-04T17:19:27.814Z",
+          "end": "2026-11-04T17:35:00.188Z"
+        },
+        {
+          "start": "2026-11-05T19:37:00.000Z",
+          "end": "2026-11-05T19:57:02.461Z"
+        },
+        {
+          "start": "2026-11-06T17:31:59.999Z",
+          "end": "2026-11-06T17:53:21.628Z"
+        }
+      ],
+      "minutesPerWeek": 73.4
+    },
+    {
+      "id": "wf_returns",
+      "label": "Return request email → refund in Shopify → log in returns sheet",
+      "path": [
+        {
+          "appKey": "gmail",
+          "action": "read"
+        },
+        {
+          "appKey": "shopify",
+          "action": "approve"
+        },
+        {
+          "appKey": "google_sheets",
+          "action": "edit"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T17:12:00.000Z",
+          "end": "2026-11-02T17:21:17.226Z"
+        },
+        {
+          "start": "2026-11-03T17:06:00.000Z",
+          "end": "2026-11-03T17:14:18.629Z"
+        },
+        {
+          "start": "2026-11-03T20:59:22.695Z",
+          "end": "2026-11-03T21:07:38.013Z"
+        },
+        {
+          "start": "2026-11-04T20:25:00.000Z",
+          "end": "2026-11-04T20:33:26.324Z"
+        },
+        {
+          "start": "2026-11-05T16:54:53.636Z",
+          "end": "2026-11-05T17:04:27.874Z"
+        },
+        {
+          "start": "2026-11-05T20:39:24.692Z",
+          "end": "2026-11-05T20:45:40.862Z"
+        },
+        {
+          "start": "2026-11-06T20:03:34.786Z",
+          "end": "2026-11-06T20:11:47.517Z"
+        }
+      ],
+      "minutesPerWeek": 58.3
+    },
+    {
+      "id": "wf_daily_ops_report",
+      "label": "Shopify analytics → daily ops sheet → post summary in Slack",
+      "path": [
+        {
+          "appKey": "shopify",
+          "action": "review"
+        },
+        {
+          "appKey": "google_sheets",
+          "action": "paste"
+        },
+        {
+          "appKey": "slack",
+          "action": "compose"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T14:44:00.000Z",
+          "end": "2026-11-02T14:55:08.233Z"
+        },
+        {
+          "start": "2026-11-03T15:07:06.539Z",
+          "end": "2026-11-03T15:18:59.749Z"
+        },
+        {
+          "start": "2026-11-04T14:50:00.000Z",
+          "end": "2026-11-04T15:03:37.943Z"
+        },
+        {
+          "start": "2026-11-05T15:02:00.000Z",
+          "end": "2026-11-05T15:13:47.956Z"
+        },
+        {
+          "start": "2026-11-06T14:53:13.991Z",
+          "end": "2026-11-06T15:08:35.153Z"
+        }
+      ],
+      "minutesPerWeek": 63.8
+    }
+  ],
+  "distractors": [
+    "Zendesk view browsing without order lookups (same app as the main workflow)",
+    "Asana Q4 projects and Holiday promo planning in Google Sheets",
+    "ShipStation label checks",
+    "Daily Google Meet standup, 3PL review, 1:1",
+    "Heavy Slack chatter across #ops/#cx-team/#warehouse",
+    "Notion page with integration tokens (must be redacted)",
+    "Shopify login via 1Password (secure field), personal banking, private windows (excluded)",
+    "LinkedIn, Amazon shopping, news, YouTube, coffee and lunch idle gaps"
+  ]
+}

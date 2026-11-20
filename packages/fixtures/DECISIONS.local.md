@@ -1,0 +1,14 @@
+- Fixture audit window starts at each persona's LOCAL Monday 2026-11-02 00:00 (stored as UTC in `startsAt`) so audit days align with local days; for the UTC-8 founder a Z-midnight start would push Sunday evening out of the window.
+- Unknown apps resolve to `other:<slug>`: browser sites use the host minus `www.` (e.g. `other:track.toggl.com`), native apps the slugified OS app name (e.g. `other:toggl-track`); a browser with no URL stays `browser`.
+- `AppRef.name` for browser sites is the resolved app's display name (e.g. "Stripe Dashboard"), not the browser's name, so per-event names match the AppKey.
+- `digestHash` = sha256 hex of `JSON.stringify([headings, labels, text])` after NFC + whitespace-collapse + trim on each string (post-redaction, post-truncation).
+- Event ids are uuid v5 of `<persona>:<seq>` under a fixed fixture namespace; `seq` starts at 1 and is gap-free; first event is `capture_state: started`.
+- Excluded stretch = from an excluded focus until the next non-excluded focus; ax/clipboard samples inside it are dropped, idle events are kept; reason is `private_window` or `exclusion_rule` (never names the app).
+- Secure-field digests replace the whole `text` with `[REDACTED:password_field]`; headings/labels still go through normal redaction.
+- Redaction runs before truncation; truncation never leaves a half placeholder.
+- URL handling in free text: keep scheme+host, replace path/query/fragment with `[REDACTED:url_path]`, URL userinfo credentials with `[REDACTED:api_key]`.
+- `key=value` / `password: x` assignments are redacted by context (api_key / password_field) even when the value has no recognisable shape.
+- events.json is a JSON array with one event per line (compact but diffable); raw.jsonl is JSONL; both byte-deterministic.
+- Generated data is committed; a test regenerates every persona and compares sha256 with the committed files.
+- Build script builds @tracer/schema only if its dist is missing (scripts/ensure-schema.mjs); tests alias @tracer/schema to its source so they need no prior build.
+- Hostile corpus items carry an extra informational `category` field besides `{input, mustNotContain, mustContain?}`.

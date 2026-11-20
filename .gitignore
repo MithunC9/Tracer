@@ -15,3 +15,5 @@ playwright-report/
 test-results/
 apps/agent/src-tauri/gen/
 .claude/worktrees/
+packages/fixtures/data/*/raw.jsonl
+packages/fixtures/data/hostile-corpus.json

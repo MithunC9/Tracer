@@ -1,0 +1,208 @@
+{
+  "persona": "bookkeeper",
+  "description": "Priya, independent bookkeeper for six small businesses (New York, UTC-5). Works in Stripe, Google Sheets, QuickBooks Online, Expensify, BILL and Gmail; many client bank-portal visits (excluded by default).",
+  "startsAt": "2026-11-02T05:00:00.000Z",
+  "days": 7,
+  "workflows": [
+    {
+      "id": "wf_stripe_payouts",
+      "label": "Stripe payouts → export CSV → clean in Google Sheets → enter deposits in QuickBooks",
+      "path": [
+        {
+          "appKey": "stripe",
+          "action": "review"
+        },
+        {
+          "appKey": "stripe",
+          "action": "export"
+        },
+        {
+          "appKey": "google_sheets",
+          "action": "import"
+        },
+        {
+          "appKey": "google_sheets",
+          "action": "edit"
+        },
+        {
+          "appKey": "quickbooks",
+          "action": "reconcile"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T14:15:00.000Z",
+          "end": "2026-11-02T14:37:14.431Z"
+        },
+        {
+          "start": "2026-11-03T15:11:00.000Z",
+          "end": "2026-11-03T15:36:03.876Z"
+        },
+        {
+          "start": "2026-11-04T19:21:11.489Z",
+          "end": "2026-11-04T19:49:27.119Z"
+        },
+        {
+          "start": "2026-11-05T14:33:07.480Z",
+          "end": "2026-11-05T14:55:10.817Z"
+        },
+        {
+          "start": "2026-11-06T15:47:00.000Z",
+          "end": "2026-11-06T16:13:59.486Z"
+        }
+      ],
+      "minutesPerWeek": 124.6
+    },
+    {
+      "id": "wf_expense_receipts",
+      "label": "Review Expensify reports → approve → categorize expenses in QuickBooks",
+      "path": [
+        {
+          "appKey": "expensify",
+          "action": "review"
+        },
+        {
+          "appKey": "expensify",
+          "action": "approve"
+        },
+        {
+          "appKey": "quickbooks",
+          "action": "edit"
+        },
+        {
+          "appKey": "gmail",
+          "action": "compose"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T19:09:00.000Z",
+          "end": "2026-11-02T19:22:36.306Z"
+        },
+        {
+          "start": "2026-11-03T14:04:38.796Z",
+          "end": "2026-11-03T14:16:18.840Z"
+        },
+        {
+          "start": "2026-11-04T15:18:00.000Z",
+          "end": "2026-11-04T15:29:04.517Z"
+        },
+        {
+          "start": "2026-11-05T18:40:31.010Z",
+          "end": "2026-11-05T18:51:14.529Z"
+        },
+        {
+          "start": "2026-11-06T14:17:00.000Z",
+          "end": "2026-11-06T14:32:23.005Z"
+        },
+        {
+          "start": "2026-11-06T19:54:00.000Z",
+          "end": "2026-11-06T20:05:09.952Z"
+        }
+      ],
+      "minutesPerWeek": 73.6
+    },
+    {
+      "id": "wf_bill_pay",
+      "label": "Vendor bill in Gmail → open PDF → enter bill in BILL → approve payment",
+      "path": [
+        {
+          "appKey": "gmail",
+          "action": "read"
+        },
+        {
+          "appKey": "pdf_viewer",
+          "action": "review"
+        },
+        {
+          "appKey": "bill_com",
+          "action": "compose"
+        },
+        {
+          "appKey": "bill_com",
+          "action": "approve"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T15:35:44.923Z",
+          "end": "2026-11-02T15:45:49.154Z"
+        },
+        {
+          "start": "2026-11-02T20:35:00.000Z",
+          "end": "2026-11-02T20:44:50.893Z"
+        },
+        {
+          "start": "2026-11-03T19:26:41.036Z",
+          "end": "2026-11-03T19:39:35.805Z"
+        },
+        {
+          "start": "2026-11-04T14:17:00.000Z",
+          "end": "2026-11-04T14:29:10.865Z"
+        },
+        {
+          "start": "2026-11-05T16:05:48.089Z",
+          "end": "2026-11-05T16:15:51.879Z"
+        },
+        {
+          "start": "2026-11-06T18:21:10.952Z",
+          "end": "2026-11-06T18:34:45.690Z"
+        },
+        {
+          "start": "2026-11-07T15:27:00.000Z",
+          "end": "2026-11-07T15:36:55.542Z"
+        }
+      ],
+      "minutesPerWeek": 78.6
+    },
+    {
+      "id": "wf_month_end_pack",
+      "label": "Pull P&L from QuickBooks → paste into Excel client pack → email client",
+      "path": [
+        {
+          "appKey": "quickbooks",
+          "action": "export"
+        },
+        {
+          "appKey": "excel",
+          "action": "paste"
+        },
+        {
+          "appKey": "excel",
+          "action": "edit"
+        },
+        {
+          "appKey": "gmail",
+          "action": "compose"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-03T20:23:34.292Z",
+          "end": "2026-11-03T20:45:19.149Z"
+        },
+        {
+          "start": "2026-11-05T19:22:00.000Z",
+          "end": "2026-11-05T19:37:03.133Z"
+        },
+        {
+          "start": "2026-11-06T20:25:00.000Z",
+          "end": "2026-11-06T20:44:20.330Z"
+        }
+      ],
+      "minutesPerWeek": 56.1
+    }
+  ],
+  "distractors": [
+    "Client bank-portal logins and statement downloads (excluded by default: bank_portal hosts)",
+    "QuickBooks \"Banking\" feed review — excluded by the default \"bank\" title keyword",
+    "Ad-hoc Google Sheets work on the client tracker (same app as workflows, not a workflow)",
+    "Payroll summary edits in Excel",
+    "Zoom client meetings (Mon, Wed, Thu)",
+    "W-9 PDF review in Preview (contains SSN, must be redacted)",
+    "Gmail inbox triage, Slack Connect chatter, IRS form lookups, news, YouTube",
+    "1Password unlocks (excluded) followed by QuickBooks sign-in with a secure password field",
+    "Private-browsing windows and a health-portal visit (excluded)",
+    "Lunch and coffee idle gaps"
+  ]
+}

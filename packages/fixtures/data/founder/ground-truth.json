@@ -1,0 +1,226 @@
+{
+  "persona": "founder",
+  "description": "Alex, solo technical founder of an early-stage B2B SaaS (San Francisco, UTC-8). Codes in VS Code, sells via LinkedIn → HubSpot → Calendly, handles support in Intercom, tracks MRR from Stripe.",
+  "startsAt": "2026-11-02T08:00:00.000Z",
+  "days": 7,
+  "workflows": [
+    {
+      "id": "wf_lead_to_crm",
+      "label": "LinkedIn lead → copy into HubSpot → email a Calendly link",
+      "path": [
+        {
+          "appKey": "linkedin",
+          "action": "read"
+        },
+        {
+          "appKey": "hubspot",
+          "action": "compose"
+        },
+        {
+          "appKey": "calendly",
+          "action": "copy"
+        },
+        {
+          "appKey": "gmail",
+          "action": "compose"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T16:39:00.000Z",
+          "end": "2026-11-02T16:53:04.900Z"
+        },
+        {
+          "start": "2026-11-02T19:57:39.899Z",
+          "end": "2026-11-02T20:10:25.145Z"
+        },
+        {
+          "start": "2026-11-03T16:29:28.902Z",
+          "end": "2026-11-03T16:40:58.621Z"
+        },
+        {
+          "start": "2026-11-03T23:24:00.000Z",
+          "end": "2026-11-03T23:34:20.275Z"
+        },
+        {
+          "start": "2026-11-04T16:41:00.000Z",
+          "end": "2026-11-04T16:53:46.074Z"
+        },
+        {
+          "start": "2026-11-04T21:46:00.001Z",
+          "end": "2026-11-04T21:58:45.906Z"
+        },
+        {
+          "start": "2026-11-05T16:19:00.000Z",
+          "end": "2026-11-05T16:33:18.525Z"
+        },
+        {
+          "start": "2026-11-05T20:31:41.861Z",
+          "end": "2026-11-05T20:41:51.767Z"
+        },
+        {
+          "start": "2026-11-06T00:36:33.700Z",
+          "end": "2026-11-06T00:50:04.260Z"
+        },
+        {
+          "start": "2026-11-06T16:46:00.000Z",
+          "end": "2026-11-06T17:00:17.684Z"
+        },
+        {
+          "start": "2026-11-06T21:09:42.000Z",
+          "end": "2026-11-06T21:22:21.490Z"
+        },
+        {
+          "start": "2026-11-09T03:33:00.000Z",
+          "end": "2026-11-09T03:48:21.401Z"
+        }
+      ],
+      "minutesPerWeek": 154.5
+    },
+    {
+      "id": "wf_support_to_issue",
+      "label": "Intercom conversation → file GitHub issue → reply to customer",
+      "path": [
+        {
+          "appKey": "intercom",
+          "action": "read"
+        },
+        {
+          "appKey": "github",
+          "action": "compose"
+        },
+        {
+          "appKey": "intercom",
+          "action": "compose"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T18:21:00.000Z",
+          "end": "2026-11-02T18:32:30.793Z"
+        },
+        {
+          "start": "2026-11-02T23:28:00.000Z",
+          "end": "2026-11-02T23:41:29.473Z"
+        },
+        {
+          "start": "2026-11-03T19:14:00.000Z",
+          "end": "2026-11-03T19:24:33.027Z"
+        },
+        {
+          "start": "2026-11-04T18:36:00.000Z",
+          "end": "2026-11-04T18:47:52.628Z"
+        },
+        {
+          "start": "2026-11-05T00:16:00.000Z",
+          "end": "2026-11-05T00:28:22.492Z"
+        },
+        {
+          "start": "2026-11-05T22:41:17.151Z",
+          "end": "2026-11-05T22:52:34.492Z"
+        },
+        {
+          "start": "2026-11-06T18:21:00.001Z",
+          "end": "2026-11-06T18:32:18.108Z"
+        },
+        {
+          "start": "2026-11-07T18:11:59.999Z",
+          "end": "2026-11-07T18:25:09.851Z"
+        }
+      ],
+      "minutesPerWeek": 95.6
+    },
+    {
+      "id": "wf_mrr_update",
+      "label": "Read MRR in Stripe → update metrics sheet → post in Slack",
+      "path": [
+        {
+          "appKey": "stripe",
+          "action": "review"
+        },
+        {
+          "appKey": "google_sheets",
+          "action": "edit"
+        },
+        {
+          "appKey": "slack",
+          "action": "compose"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T17:09:00.000Z",
+          "end": "2026-11-02T17:23:50.973Z"
+        },
+        {
+          "start": "2026-11-03T17:09:00.000Z",
+          "end": "2026-11-03T17:18:24.721Z"
+        },
+        {
+          "start": "2026-11-04T17:14:00.000Z",
+          "end": "2026-11-04T17:23:13.989Z"
+        },
+        {
+          "start": "2026-11-05T17:17:00.000Z",
+          "end": "2026-11-05T17:29:20.449Z"
+        },
+        {
+          "start": "2026-11-06T17:05:00.000Z",
+          "end": "2026-11-06T17:14:37.051Z"
+        }
+      ],
+      "minutesPerWeek": 55.5
+    },
+    {
+      "id": "wf_ship_release",
+      "label": "Review & merge PR on GitHub → deploy from terminal → update Linear",
+      "path": [
+        {
+          "appKey": "github",
+          "action": "review"
+        },
+        {
+          "appKey": "github",
+          "action": "approve"
+        },
+        {
+          "appKey": "terminal",
+          "action": "upload"
+        },
+        {
+          "appKey": "linear",
+          "action": "edit"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-03T00:25:00.000Z",
+          "end": "2026-11-03T00:40:47.294Z"
+        },
+        {
+          "start": "2026-11-04T23:18:00.000Z",
+          "end": "2026-11-04T23:35:00.303Z"
+        },
+        {
+          "start": "2026-11-06T00:04:00.001Z",
+          "end": "2026-11-06T00:20:05.363Z"
+        },
+        {
+          "start": "2026-11-06T23:19:49.026Z",
+          "end": "2026-11-06T23:33:25.937Z"
+        }
+      ],
+      "minutesPerWeek": 62.5
+    }
+  ],
+  "distractors": [
+    "Long VS Code coding sessions; .env with OpenAI/Anthropic/Stripe keys (must be redacted)",
+    "Terminal work with JWTs, AWS key ids and GitHub tokens (must be redacted)",
+    "Stripe API-keys page (same app as MRR workflow, not a workflow)",
+    "LinkedIn feed browsing (same app as the lead workflow, not a workflow)",
+    "Zoom demos, investor and advisor calls",
+    "Investor update drafting in Notion, Figma, X, Hacker News, AI assistants",
+    "Weekend: Saturday support, Sunday evening lead follow-up",
+    "Personal banking (Mercury), private windows, 1Password → Stripe login (excluded / secure field)"
+  ]
+}

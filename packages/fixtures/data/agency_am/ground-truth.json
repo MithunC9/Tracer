@@ -1,0 +1,201 @@
+{
+  "persona": "agency_am",
+  "description": "Sam, account manager at a 20-person marketing agency handling five retainer clients (London, UTC+0). HubSpot reporting, Canva content approvals, Notion call notes, Mailchimp tracking.",
+  "startsAt": "2026-11-02T00:00:00.000Z",
+  "days": 7,
+  "workflows": [
+    {
+      "id": "wf_weekly_client_report",
+      "label": "Pull weekly metrics from HubSpot → paste into Google Docs report → email client",
+      "path": [
+        {
+          "appKey": "hubspot",
+          "action": "review"
+        },
+        {
+          "appKey": "google_docs",
+          "action": "paste"
+        },
+        {
+          "appKey": "google_docs",
+          "action": "edit"
+        },
+        {
+          "appKey": "gmail",
+          "action": "compose"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T09:12:00.000Z",
+          "end": "2026-11-02T09:29:12.656Z"
+        },
+        {
+          "start": "2026-11-02T10:54:21.027Z",
+          "end": "2026-11-02T11:11:35.478Z"
+        },
+        {
+          "start": "2026-11-02T14:52:00.000Z",
+          "end": "2026-11-02T15:19:53.852Z"
+        },
+        {
+          "start": "2026-11-03T09:45:00.000Z",
+          "end": "2026-11-03T10:07:42.258Z"
+        },
+        {
+          "start": "2026-11-03T11:24:17.257Z",
+          "end": "2026-11-03T11:47:35.312Z"
+        }
+      ],
+      "minutesPerWeek": 108.4
+    },
+    {
+      "id": "wf_content_approval",
+      "label": "Finish social posts in Canva → send for client approval → update Asana",
+      "path": [
+        {
+          "appKey": "canva",
+          "action": "edit"
+        },
+        {
+          "appKey": "gmail",
+          "action": "compose"
+        },
+        {
+          "appKey": "asana",
+          "action": "edit"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T16:18:00.000Z",
+          "end": "2026-11-02T16:35:08.458Z"
+        },
+        {
+          "start": "2026-11-03T15:05:00.000Z",
+          "end": "2026-11-03T15:17:25.598Z"
+        },
+        {
+          "start": "2026-11-04T09:53:00.000Z",
+          "end": "2026-11-04T10:03:59.484Z"
+        },
+        {
+          "start": "2026-11-04T15:35:00.000Z",
+          "end": "2026-11-04T15:52:15.648Z"
+        },
+        {
+          "start": "2026-11-05T11:37:04.050Z",
+          "end": "2026-11-05T11:51:40.057Z"
+        },
+        {
+          "start": "2026-11-06T10:35:00.000Z",
+          "end": "2026-11-06T10:51:48.651Z"
+        }
+      ],
+      "minutesPerWeek": 89.2
+    },
+    {
+      "id": "wf_call_recap",
+      "label": "After client call: notes in Notion → tasks in Asana → recap email",
+      "path": [
+        {
+          "appKey": "notion",
+          "action": "compose"
+        },
+        {
+          "appKey": "asana",
+          "action": "compose"
+        },
+        {
+          "appKey": "gmail",
+          "action": "compose"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T14:05:23.011Z",
+          "end": "2026-11-02T14:16:21.146Z"
+        },
+        {
+          "start": "2026-11-03T13:46:49.999Z",
+          "end": "2026-11-03T13:59:56.457Z"
+        },
+        {
+          "start": "2026-11-04T11:55:51.074Z",
+          "end": "2026-11-04T12:09:54.441Z"
+        },
+        {
+          "start": "2026-11-04T16:52:00.000Z",
+          "end": "2026-11-04T17:09:52.506Z"
+        },
+        {
+          "start": "2026-11-05T15:18:00.000Z",
+          "end": "2026-11-05T15:32:53.810Z"
+        },
+        {
+          "start": "2026-11-06T12:12:23.628Z",
+          "end": "2026-11-06T12:27:08.312Z"
+        }
+      ],
+      "minutesPerWeek": 85.6
+    },
+    {
+      "id": "wf_campaign_tracker",
+      "label": "Check Mailchimp campaign stats → update Google Sheets tracker",
+      "path": [
+        {
+          "appKey": "mailchimp",
+          "action": "review"
+        },
+        {
+          "appKey": "google_sheets",
+          "action": "edit"
+        }
+      ],
+      "occurrences": [
+        {
+          "start": "2026-11-02T13:18:00.000Z",
+          "end": "2026-11-02T13:26:55.497Z"
+        },
+        {
+          "start": "2026-11-03T10:37:36.449Z",
+          "end": "2026-11-03T10:43:35.420Z"
+        },
+        {
+          "start": "2026-11-03T16:31:03.426Z",
+          "end": "2026-11-03T16:38:57.816Z"
+        },
+        {
+          "start": "2026-11-04T09:22:00.000Z",
+          "end": "2026-11-04T09:28:25.515Z"
+        },
+        {
+          "start": "2026-11-05T09:29:00.000Z",
+          "end": "2026-11-05T09:40:00.090Z"
+        },
+        {
+          "start": "2026-11-05T13:20:39.625Z",
+          "end": "2026-11-05T13:28:35.018Z"
+        },
+        {
+          "start": "2026-11-06T09:20:47.084Z",
+          "end": "2026-11-06T09:32:02.222Z"
+        },
+        {
+          "start": "2026-11-06T14:13:27.934Z",
+          "end": "2026-11-06T14:19:12.964Z"
+        }
+      ],
+      "minutesPerWeek": 65.2
+    }
+  ],
+  "distractors": [
+    "Google Slides strategy pitch (resolves to other:docs.google.com — Slides is not in the app taxonomy)",
+    "Zoom client calls (the recap workflow follows some of them; the call itself is not part of the workflow)",
+    "HubSpot contact lookups (same app as reporting, not a workflow)",
+    "Canva moodboards, Google Analytics glances, LinkedIn",
+    "Heavy Slack and Gmail triage",
+    "Meta billing page with a card and IBAN, Notion page with tokens (must be redacted)",
+    "Agency all-hands, private windows, personal banking, HubSpot login via 1Password"
+  ]
+}
