@@ -62,6 +62,8 @@ env.NEXT_PUBLIC_API_URL ??= API_URL;
 
 // ---------------------------------------------------------------- process management
 const children = new Set();
+/** Every child ever started (each leads its own process group), for shutdown. */
+const started = [];
 let stopping = false;
 
 /** Pino JSON -> one short line; request pairs collapse to "GET /v1/x -> 200 3ms". */
@@ -111,6 +113,7 @@ function pipeLines(stream, name) {
 function start(name, cmd, args, opts = {}) {
   const child = spawn(cmd, args, { cwd: opts.cwd ?? root, env: { ...env, ...opts.env }, stdio: ['ignore', 'pipe', 'pipe'], detached: process.platform !== 'win32' });
   children.add(child);
+  started.push(child);
   pipeLines(child.stdout, name);
   pipeLines(child.stderr, name);
   child.on('exit', () => children.delete(child));
@@ -135,14 +138,26 @@ function killTree(child, signal) {
   }
 }
 
+/** Is any process left in this child's process group? (next dev leaves next-server behind otherwise) */
+function groupAlive(child) {
+  if (process.platform === 'win32') return children.has(child);
+  try {
+    process.kill(-child.pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function shutdown(code = 0) {
   if (stopping) return;
   stopping = true;
-  if (children.size) say('dev', 'stopping…');
-  for (const c of children) killTree(c, 'SIGTERM');
+  const all = [...started];
+  if (all.some(groupAlive)) say('dev', 'stopping…');
+  for (const c of all) killTree(c, 'SIGTERM');
   const deadline = Date.now() + 8000;
-  while (children.size && Date.now() < deadline) await sleep(100);
-  for (const c of children) killTree(c, 'SIGKILL');
+  while (all.some(groupAlive) && Date.now() < deadline) await sleep(100);
+  for (const c of all) if (groupAlive(c)) killTree(c, 'SIGKILL');
   process.exit(code);
 }
 process.on('SIGINT', () => void shutdown(0));
