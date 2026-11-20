@@ -1,0 +1,24 @@
+[package]
+name = "tracer-agent"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+description = "Tracer desktop agent: tray app + settings window around tracer-core."
+license = "UNLICENSED"
+publish = false
+
+# Separate from tracer-core so the core builds and tests on Linux CI without WebKit.
+[workspace]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tracer-core = { path = "../core" }
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = "0.4"
+log = "0.4"
+env_logger = "0.11"
+uuid = "1"

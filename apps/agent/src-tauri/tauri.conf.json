@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Tracer",
+  "version": "0.1.0",
+  "identifier": "ai.tracer.agent",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5174",
+    "beforeDevCommand": "pnpm --filter @tracer/agent-ui dev",
+    "beforeBuildCommand": "pnpm --filter @tracer/agent-ui build"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Tracer",
+        "width": 920,
+        "height": 760,
+        "minWidth": 560,
+        "minHeight": 480,
+        "visible": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:; connect-src ipc: http://ipc.localhost"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg"],
+    "category": "Productivity",
+    "shortDescription": "Observe your own work for a time-boxed audit.",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.png"],
+    "macOS": {
+      "minimumSystemVersion": "12.0"
+    }
+  }
+}
