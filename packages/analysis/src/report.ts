@@ -12,7 +12,7 @@ import {
 } from '@tracer/schema';
 import type { AnalysisConfig } from './config.js';
 import { extractNumbers } from './fallback.js';
-import type { FindingFacts, Recommendation, SummaryFacts, UsageReport, ValidationResult } from './ports.js';
+import type { AllowedNumbersPolicy, FindingFacts, Recommendation, SummaryFacts, UsageReport, ValidationResult } from './ports.js';
 import type { CaptureStats } from './sessionize.js';
 import { DAY_MS, r1, toIso, toMs } from './util.js';
 
@@ -149,12 +149,19 @@ export interface FindingDraft {
   facts: FindingFacts;
 }
 
-export function draftFindings(top: readonly ScoredCluster[], recs: readonly Recommendation[], daysObserved: number): FindingDraft[] {
+export function draftFindings(
+  top: readonly ScoredCluster[],
+  recs: readonly Recommendation[],
+  daysObserved: number,
+  policy?: AllowedNumbersPolicy,
+): FindingDraft[] {
   return top.map((c, idx) => {
     const rec = recs[idx]!;
     const rank = idx + 1;
-    const allowedNumbers = findingAllowedNumbers(c, rank, rec, daysObserved, c.label);
     const metrics = metricsOf(c);
+    const allowedNumbers = policy
+      ? policy.finding({ metrics, score: c.score, path: c.canonicalPath, recipe: rec.recipe })
+      : findingAllowedNumbers(c, rank, rec, daysObserved, c.label);
     return {
       cluster: c,
       rank,
@@ -203,9 +210,26 @@ export function summaryCalculation(drafts: readonly FindingDraft[]): { total: nu
   return { total, steps };
 }
 
-export function summaryFacts(drafts: readonly FindingDraft[], win: WindowFacts, stats: CaptureStats): SummaryFacts {
+export function summaryFacts(drafts: readonly FindingDraft[], win: WindowFacts, stats: CaptureStats, policy?: AllowedNumbersPolicy): SummaryFacts {
   const { total } = summaryCalculation(drafts);
   const top = drafts[0]?.cluster.label ?? null;
+  if (policy) {
+    const topHours = drafts[0]?.cluster.score.outputs.reclaimableHoursPerWeek;
+    return {
+      reclaimableHoursPerWeek: total,
+      daysObserved: win.daysObserved,
+      findingCount: drafts.length,
+      topFindingLabel: top,
+      allowedNumbers: policy.summary({
+        reclaimableHoursPerWeek: total,
+        daysObserved: win.daysObserved,
+        findingCount: drafts.length,
+        daysPlanned: win.daysPlanned,
+        activeHoursObserved: win.activeHoursObserved,
+        ...(topHours !== undefined ? { topFindingHoursPerWeek: topHours } : {}),
+      }),
+    };
+  }
   return {
     reclaimableHoursPerWeek: total,
     daysObserved: win.daysObserved,
@@ -300,6 +324,8 @@ export interface BuildReportInput {
   usage: UsageReport;
   clustersFound: number;
   notes: readonly string[];
+  /** Same policy the drafts were built with (see PipelineDeps.allowedNumbers). */
+  allowed?: AllowedNumbersPolicy;
 }
 
 /** Assemble the AuditReport (numbers from code, prose from the narrator) and validate its shape. */
@@ -322,7 +348,7 @@ export function buildReport(x: BuildReportInput): AuditReport {
     };
   });
   const calc = summaryCalculation(x.drafts);
-  const sf = summaryFacts(x.drafts, x.win, x.stats);
+  const sf = summaryFacts(x.drafts, x.win, x.stats, x.allowed);
   const report: AuditReport = {
     reportVersion: REPORT_VERSION,
     auditId: x.ctx.auditId,

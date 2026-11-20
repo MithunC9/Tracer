@@ -1,6 +1,6 @@
 import { and, desc, eq, inArray, isNotNull, sql } from 'drizzle-orm';
 import type { PipelineStage, StageState } from '@tracer/schema';
-import { pipelineRuns, reports, stageOutputs } from '../db/schema.js';
+import { llmCache, pipelineRuns, reports, stageOutputs } from '../db/schema.js';
 import type { Tx } from '../db/database.js';
 
 export type RunRow = typeof pipelineRuns.$inferSelect;
@@ -114,5 +114,21 @@ export class PipelineRepo {
       .from(reports)
       .where(and(eq(reports.auditId, auditId), eq(reports.userId, this.tx.userId)));
     return r ?? null;
+  }
+
+  /** Encrypted LLM response cache, per tenant (RLS). */
+  async getLlmCache(cacheKey: string): Promise<Buffer | null> {
+    const [r] = await this.tx.db
+      .select({ v: llmCache.responseEnc })
+      .from(llmCache)
+      .where(and(eq(llmCache.userId, this.tx.userId), eq(llmCache.cacheKey, cacheKey)));
+    return r?.v ?? null;
+  }
+
+  async putLlmCache(cacheKey: string, responseEnc: Buffer, at: Date) {
+    await this.tx.db
+      .insert(llmCache)
+      .values({ userId: this.tx.userId, cacheKey, responseEnc, createdAt: at })
+      .onConflictDoUpdate({ target: [llmCache.userId, llmCache.cacheKey], set: { responseEnc, createdAt: at } });
   }
 }

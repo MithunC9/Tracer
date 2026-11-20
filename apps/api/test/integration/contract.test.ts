@@ -97,8 +97,10 @@ describe('contract', () => {
     expect(proto.statusCode).toBe(400);
   });
 
-  it('serves the empty catalog from the CatalogSource port', async () => {
+  it('serves the @tracer/catalog entries from the CatalogSource port', async () => {
     const res = await h.app.inject({ method: 'GET', url: '/v1/catalog' });
-    expect(res.json()).toEqual({ items: [] });
+    const { CATALOG } = await import('@tracer/catalog');
+    expect(CATALOG.length).toBeGreaterThan(0);
+    expect(res.json().items).toHaveLength(CATALOG.length);
   });
 });

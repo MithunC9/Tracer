@@ -8,7 +8,8 @@ import { KeyRing } from './lib/crypto.js';
 import { TokenBucketLimiter } from './lib/rate-limit.js';
 import { createMetrics, type Metrics } from './observability/metrics.js';
 import type { PipelineEngine } from './pipeline/engine.js';
-import { stubEngine } from './pipeline/stub-engine.js';
+import { analysisEngineFromEnv } from './pipeline/analysis-engine.js';
+import { PgLlmCache } from './pipeline/llm-cache.js';
 import { PgAuthLookups } from './repositories/lookups.js';
 import { PgUnitOfWork } from './repositories/index.js';
 import { withAccessLog } from './services/access-log.js';
@@ -17,16 +18,17 @@ import { AccessTokens, Argon2Hasher, AuthService, type PasswordHasher } from './
 import { KeyService } from './services/context.js';
 import { DevicesService } from './services/devices.js';
 import { IngestService } from './services/ingest.js';
-import { emptyCatalog, MeService, type CatalogSource } from './services/me.js';
+import { MeService, type CatalogSource } from './services/me.js';
+import { CATALOG } from '@tracer/catalog';
 import { PipelineService } from './services/pipeline.js';
 import { PrivacyService } from './services/privacy.js';
 
 /** Swappable ports. Anything not given gets the production default. */
 export interface Overrides {
   clock?: Clock;
-  /** INTEGRATION POINT: replace the stub with the real analysis engine (see pipeline/engine.ts). */
+  /** Default: `@tracer/analysis` with catalog + LLM deps (pipeline/analysis-engine.ts). Tests may pass the stub. */
   engine?: PipelineEngine;
-  /** INTEGRATION POINT: replace with `@tracer/catalog`. */
+  /** Default: the `@tracer/catalog` entries. */
   catalog?: CatalogSource;
   hasher?: PasswordHasher;
   queue?: JobQueue;
@@ -39,8 +41,7 @@ export interface Overrides {
  */
 export function createContainer(config: Config, log: Logger, o: Overrides = {}) {
   const clock = o.clock ?? systemClock;
-  const engine = o.engine ?? stubEngine; // <- swap for the @tracer/analysis engine
-  const catalog = o.catalog ?? emptyCatalog; // <- swap for @tracer/catalog
+  const catalog: CatalogSource = o.catalog ?? { list: async () => [...CATALOG] };
   const metrics = o.metrics ?? createMetrics({ defaultMetrics: config.NODE_ENV !== 'test' });
 
   const db = new Database(
@@ -63,6 +64,13 @@ export function createContainer(config: Config, log: Logger, o: Overrides = {}) 
   const uow = new PgUnitOfWork(db, boss);
   const lookups = new PgAuthLookups(db);
   const keys = new KeyService(new KeyRing(config.MASTER_KEY), clock);
+  const engine =
+    o.engine ??
+    analysisEngineFromEnv((userId) => new PgLlmCache(uow, keys, clock, userId), {
+      ...process.env,
+      LLM_PROVIDER: config.LLM_PROVIDER,
+      ...(config.ANTHROPIC_MODEL ? { ANTHROPIC_MODEL: config.ANTHROPIC_MODEL } : {}),
+    });
 
   const auth = new AuthService(
     uow,

@@ -63,6 +63,10 @@ export const ConfigSchema = z.object({
   /** If set, /metrics requires `Authorization: Bearer <METRICS_TOKEN>`. */
   METRICS_TOKEN: z.string().min(16).optional(),
   DOCS_ENABLED: bool(true),
+
+  /** Narration provider. `mock` is offline and deterministic; `anthropic` reads ANTHROPIC_API_KEY from env. */
+  LLM_PROVIDER: z.enum(['mock', 'anthropic']).default('mock'),
+  ANTHROPIC_MODEL: z.string().min(1).optional(),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;

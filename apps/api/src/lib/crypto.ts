@@ -49,6 +49,7 @@ export const aad = {
   report: (userId: string, auditId: string) => `reports:${userId}:${auditId}`,
   /** Content-addressed so a cached output can be reused by a later run of the same user. */
   stageOutput: (userId: string, stage: string, inputHash: string) => `stage_outputs:${userId}:${stage}:${inputHash}`,
+  llmCache: (userId: string, cacheKey: string) => `llm_cache:${userId}:${cacheKey}`,
 };
 
 export class KeyRing {

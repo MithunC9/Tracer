@@ -60,8 +60,27 @@ export interface UsageReport {
   cacheHits: number;
 }
 
+/** Numbers a finding's / the summary's prose may mention (what goes into `allowedNumbers`). */
+export interface AllowedNumbersPolicy {
+  finding(src: { metrics: Finding['metrics']; score: ScoreBreakdown; path: PathStep[]; recipe: { estSetupMinutes: number } }): number[];
+  summary(src: {
+    reclaimableHoursPerWeek: number;
+    daysObserved: number;
+    findingCount: number;
+    daysPlanned: number;
+    activeHoursObserved: number;
+    topFindingHoursPerWeek?: number;
+  }): number[];
+}
+
 /** Injected collaborators. The API wires @tracer/catalog and @tracer/llm in here. */
 export interface PipelineDeps {
+  /**
+   * Allow-list definition. Must match the validator's notion of "derivable" (the API injects
+   * `@tracer/llm`'s `allowedNumbersFor` / `allowedNumbersForSummary`, the validator's own
+   * definition). Default: the broader analysis-local lists, checked only by `basicValidate`.
+   */
+  allowedNumbers?: AllowedNumbersPolicy;
   recommend(input: RecommendInput, constraints: UserConstraints): Recommendation;
   narrateFinding(facts: FindingFacts): Promise<Narrative>;
   narrateSummary(facts: SummaryFacts): Promise<Narrative>;

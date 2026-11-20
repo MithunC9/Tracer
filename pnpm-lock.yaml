@@ -108,6 +108,15 @@ importers:
       '@opentelemetry/semantic-conventions':
         specifier: ^1.45.0
         version: 1.45.0
+      '@tracer/analysis':
+        specifier: workspace:*
+        version: link:../../packages/analysis
+      '@tracer/catalog':
+        specifier: workspace:*
+        version: link:../../packages/catalog
+      '@tracer/llm':
+        specifier: workspace:*
+        version: link:../../packages/llm
       '@tracer/schema':
         specifier: workspace:*
         version: link:../../packages/schema

@@ -126,8 +126,8 @@ export async function runPipeline(events: readonly ActivityEvent[], ctx: Pipelin
   });
   if (recs.failed) notes.push('Tool suggestions were unavailable for some workflows; a generic do-it-yourself recipe is shown instead.');
 
-  const drafts = draftFindings(top, recs.recs, win.daysObserved);
-  const sFacts = summaryFacts(drafts, win, stats);
+  const drafts = draftFindings(top, recs.recs, win.daysObserved, deps.allowedNumbers);
+  const sFacts = summaryFacts(drafts, win, stats, deps.allowedNumbers);
 
   const narr = await runner.run('narrate', { findings: drafts.map((d) => d.facts), summary: sFacts }, async () => {
     let fallbacks = 0;
@@ -154,7 +154,7 @@ export async function runPipeline(events: readonly ActivityEvent[], ctx: Pipelin
   const usage = deps.usage?.() ?? NO_USAGE;
   const episodeMap = new Map(episodes.map((e) => [e.id, e]));
   const assemble = (narratives: { findings: Narrative[]; summary: Narrative }, validator: { passed: boolean; checkedNumbers: number }, extra: string[]) =>
-    buildReport({ ctx, cfg, stats, win, drafts, episodes: episodeMap, narratives, validator, usage, clustersFound: scored.length, notes: [...notes, ...extra] });
+    buildReport({ ctx, cfg, stats, win, drafts, episodes: episodeMap, narratives, validator, usage, clustersFound: scored.length, notes: [...notes, ...extra], ...(deps.allowedNumbers ? { allowed: deps.allowedNumbers } : {}) });
 
   const draftReport = assemble(narr, { passed: false, checkedNumbers: 0 }, []);
   const validation = await runner.run('validate', { report: { ...draftReport, generatedAt: null, generation: null } }, () => {
