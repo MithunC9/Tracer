@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.test.json",
-    "test": "vitest run",
+    "test": "tsc -p tsconfig.json && vitest run",
     "validate-report": "node dist/bin/validate-report.js"
   },
   "dependencies": {

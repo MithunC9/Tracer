@@ -155,7 +155,7 @@ export class MockProvider implements LlmProvider {
     const pathSentence = shown.length
       ? pick(r, [
           `The routine: ${shown.join(', then ')}${more}.`,
-          `You go ${shown.join(' → ')}${more}.`,
+          `Each time: ${shown.join(' → ')}${more}.`,
           `It runs the same way each time: ${shown.join(', ')}${more}.`,
         ])
       : 'The steps were the same each time.';
@@ -192,7 +192,7 @@ export class MockProvider implements LlmProvider {
     const tools = f.topToolNames?.length
       ? f.topToolNames.length === 1
         ? `${f.topToolNames[0]} fits it.`
-        : pick(r, [`Tools that fit: ${f.topToolNames.slice(0, 3).join(', ')}.`, `${f.topToolNames[0]} is the closest fit; ${f.topToolNames.slice(1, 3).join(' and ')} also work.`])
+        : pick(r, [`Tools that fit: ${f.topToolNames.slice(0, 3).join(', ')}.`, `${f.topToolNames[0]} is the closest fit; ${f.topToolNames.slice(1, 3).join(' and ')} also ${f.topToolNames.length === 2 ? 'works' : 'work'}.`])
       : undefined;
     const risky = (f.score?.inputs?.riskFlags ?? []).length > 0;
     const keep = risky
