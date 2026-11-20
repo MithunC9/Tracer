@@ -1,0 +1,22 @@
+{
+  "name": "tracer",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "openapi": "pnpm --filter @tracer/schema openapi",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "prettier": "^3.6.2",
+    "turbo": "^2.5.8",
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
