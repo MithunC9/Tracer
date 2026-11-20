@@ -19,7 +19,7 @@
 
 use std::time::Duration;
 
-use crate::model::{Platform, RawSample};
+use crate::model::{Exclusions, Platform, RawSample};
 
 pub mod simulated;
 pub mod windows;
@@ -65,6 +65,9 @@ pub trait CaptureSource: Send {
     fn next_samples(&mut self, max_wait: Duration) -> Result<SourcePoll, CaptureError>;
     /// Idle threshold from AgentConfig; sources that detect idle use it.
     fn set_idle_threshold(&mut self, _seconds: u32) {}
+    /// Current exclusions, so a real source can avoid even *collecting* text from
+    /// excluded/private windows (the pipeline still enforces them independently).
+    fn set_exclusions(&mut self, _exclusions: &Exclusions) {}
 }
 
 /// The real capture source for this OS, or `Unsupported`.
