@@ -36,7 +36,7 @@ export default async function OpengraphImage() {
     (
       <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: PAPER, color: INK, padding: '56px 72px', position: 'relative' }}>
         {/* column guides */}
-        <div style={{ position: 'absolute', inset: '0 72px', display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{ position: 'absolute', top: 0, bottom: 0, left: 72, right: 72, display: 'flex', justifyContent: 'space-between' }}>
           {Array.from({ length: 7 }, (_, i) => (
             <div key={i} style={{ width: 1, height: '100%', background: RULE, opacity: 0.6 }} />
           ))}
@@ -48,7 +48,14 @@ export default async function OpengraphImage() {
         <div style={{ display: 'flex', fontFamily: 'Instrument Serif', fontSize: 96, lineHeight: 0.95, marginTop: 48, maxWidth: 820, letterSpacing: -2 }}>{headline}</div>
         <div style={{ display: 'flex', alignItems: 'flex-end', marginTop: 'auto', gap: 24 }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontFamily: 'Geist Mono', fontSize: 150, lineHeight: 0.85, letterSpacing: -8 }}>{figure}</span>
+            <div style={{ display: 'flex', fontFamily: 'Geist Mono', fontSize: 150, lineHeight: 0.85, letterSpacing: -8 }}>
+              {figure.split('.').map((part, i) => (
+                <span key={i} style={{ display: 'flex' }}>
+                  {i > 0 ? <span style={{ marginLeft: -22, marginRight: -22 }}>.</span> : null}
+                  {part}
+                </span>
+              ))}
+            </div>
             <div style={{ height: 8, background: SIGNAL, marginTop: 14, width: '104%' }} />
           </div>
           <span style={{ fontFamily: 'Geist Mono', fontSize: 26, color: GRAPHITE, paddingBottom: 26 }}>h/week reclaimable</span>

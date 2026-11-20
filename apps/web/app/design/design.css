@@ -514,6 +514,10 @@
 }
 
 @media print {
+  .rp-findings {
+    padding-top: 0;
+    gap: 0;
+  }
   .rp-bar .tr-theme,
   .ds-index {
     display: none !important;

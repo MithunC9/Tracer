@@ -228,6 +228,13 @@ export default function DesignPage() {
             </div>
           </div>
         </Specimen>
+        <Specimen label="Tailwind preset" state="@tracer/ui/theme.css">
+          <div className="border-t border-ink bg-paper-sunk p-4">
+            <p className="font-mono text-kicker uppercase text-graphite">bg-paper-sunk · border-ink · font-display · text-display-3</p>
+            <p className="mt-2 font-display text-display-3 text-ink">Utilities follow the theme.</p>
+            <p className="mt-1 text-small text-signal-ink">text-signal-ink, for errors only.</p>
+          </div>
+        </Specimen>
         <Specimen label="Motion" state="sparse, purposeful">
           <table className="ds-kv">
             <tbody>

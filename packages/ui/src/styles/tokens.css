@@ -121,10 +121,10 @@
   --tr-on-signal: #1B1611;
 }
 
-/* Print: ink on white, always. */
+/* Print: ink on white, always. The :not(#_) bumps specificity above the dark-mode rules. */
 @media print {
-  :root,
-  [data-theme] {
+  :root:not(#_),
+  [data-theme]:not(#_) {
     color-scheme: light;
     --tr-paper: #FFFFFF;
     --tr-paper-sunk: #F3F3F1;

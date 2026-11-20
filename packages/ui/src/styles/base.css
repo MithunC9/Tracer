@@ -159,7 +159,7 @@
     z-index: -1;
   }
   .tr-guides > span {
-    border-inline: var(--tr-rule-hair) solid color-mix(in oklab, var(--tr-rule) 55%, transparent);
+    border-inline: var(--tr-rule-hair) solid color-mix(in oklab, var(--tr-rule) 38%, transparent);
   }
 
   .tr-spread {

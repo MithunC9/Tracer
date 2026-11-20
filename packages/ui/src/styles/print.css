@@ -53,6 +53,9 @@
   .tr-finding {
     break-before: page;
   }
+  .tr-finding__more {
+    gap: 8mm;
+  }
   .tr-finding__mast,
   .tr-metrics,
   .tr-scale,
