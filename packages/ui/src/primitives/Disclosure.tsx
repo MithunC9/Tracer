@@ -25,7 +25,7 @@ export function Collapse({ open, id, children, className, ...aria }: CollapsePro
           key="c"
           id={id}
           className={cx('tr-collapse', className)}
-          initial={{ height: 0, opacity: 0 }}
+          initial={reduce ? false : { height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={t}

@@ -6,6 +6,7 @@ afterEach(() => cleanup());
 
 // jsdom lacks these; components feature-detect but tests should not crash.
 if (typeof window !== 'undefined') {
+  window.scrollTo = (() => {}) as typeof window.scrollTo;
   window.matchMedia ??= ((query: string) => ({
     matches: false,
     media: query,

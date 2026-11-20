@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    .p { fill: #F4F1EA; } .i { stroke: #14130F; } .t { fill: #14130F; }
+    @media (prefers-color-scheme: dark) { .p { fill: #1B1611; } .i { stroke: #EDE5D3; } .t { fill: #EDE5D3; } }
+  </style>
+  <rect class="p" width="32" height="32"/>
+  <!-- ruled baseline with four ticks: a measured trace -->
+  <path class="i" d="M4 24.5 H28" stroke-width="1.5" fill="none"/>
+  <path class="i" d="M7 24.5 V18 M12 24.5 V12 M17 24.5 V15 M22 24.5 V9" stroke-width="2.5" fill="none"/>
+  <circle cx="22" cy="6" r="2.6" fill="#E8431E"/>
+</svg>

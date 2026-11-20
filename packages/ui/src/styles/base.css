@@ -155,7 +155,7 @@
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     column-gap: var(--tr-grid-gutter);
-    z-index: 0;
+    z-index: -1;
   }
   .tr-guides > span {
     border-inline: var(--tr-rule-hair) solid color-mix(in oklab, var(--tr-rule) 55%, transparent);

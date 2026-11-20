@@ -483,7 +483,7 @@ export const sampleReport: AuditReport = {
     topFindingId: top.id,
     narrative: {
       headline: `About ${total} hours a week of your work is copying, matching and retyping`,
-      body: `Over 7 days Tracer found ${findings.length} workflows you repeated at least three times. Together they took ${observed} hours. The biggest is ${top.label.toLowerCase()}. None of the fixes need new staff, and every one keeps you in charge of the decisions.`,
+      body: `Over 7 days Tracer found ${findings.length} workflows you repeated at least three times. Together they took ${observed} hours. The biggest one: ${top.label.charAt(0).toLowerCase() + top.label.slice(1)}. None of the fixes need new staff, and every one keeps you in charge of the decisions.`,
     },
     allowedNumbers: [total, findings.length, observed, 7, 3],
   },

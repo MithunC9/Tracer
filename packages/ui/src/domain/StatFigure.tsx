@@ -51,6 +51,27 @@ export function CalcSteps({ steps, decimals, className, caption }: CalcStepsProp
 
 /* ---------- StatFigure ---------- */
 
+/**
+ * Monospaced digits with the separators tucked in: at display size a mono "." or ","
+ * takes a full digit width and opens a hole in the number.
+ */
+function Digits({ text }: { text: string }) {
+  const parts = text.split(/([.,])/);
+  return (
+    <>
+      {parts.map((p, i) =>
+        p === '.' || p === ',' ? (
+          <span key={i} className="tr-stat__sep">
+            {p}
+          </span>
+        ) : (
+          p
+        ),
+      )}
+    </>
+  );
+}
+
 export interface StatFigureProps {
   value: number;
   decimals?: number;
@@ -155,12 +176,12 @@ export function StatFigure({
                 {typeof unit === 'string' ? ` ${unit}` : ''}
               </span>
               <span className="tr-stat__value tr-num" aria-hidden="true">
-                {shown}
+                <Digits text={shown} />
               </span>
             </>
           )}
           {drawUnderline ? (
-            <svg className="tr-stat__underline" viewBox="0 0 200 10" preserveAspectRatio="none" aria-hidden="true">
+            <svg className="tr-stat__underline" viewBox="0 0 200 10" aria-hidden="true">
               <motion.path
                 d={underlinePath(200)}
                 fill="none"

@@ -17,6 +17,7 @@ export * from './primitives/Tabs.js';
 export * from './primitives/Feedback.js';
 export * from './primitives/Disclosure.js';
 export * from './primitives/ThemeToggle.js';
+export * from './primitives/Stagger.js';
 
 // domain
 export * from './domain/glyphs.js';
