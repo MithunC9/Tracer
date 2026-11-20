@@ -22,6 +22,7 @@ const factorWord = {
   skill: 'fits skill',
   effort: 'setup effort',
   open_source: 'open source',
+  determinism: 'predictable steps',
 } as const;
 
 function FitMeter({ score }: { score: number }) {
