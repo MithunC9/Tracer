@@ -138,6 +138,15 @@ export class AnthropicProvider implements LlmProvider {
     }
   }
 
+  /** The SDK client holds the key; keep it out of JSON and console output. */
+  toJSON(): { name: string; model: string } {
+    return { name: this.name, model: this.model };
+  }
+
+  [Symbol.for('nodejs.util.inspect.custom')](): string {
+    return `AnthropicProvider { model: '${this.model}' }`;
+  }
+
   private useFallback(): boolean {
     return this.refusalFallback && FALLBACK_MODELS.includes(this.model);
   }
