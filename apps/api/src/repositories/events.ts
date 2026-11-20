@@ -66,12 +66,22 @@ export class EventsRepo {
     return r.rowCount ?? 0;
   }
 
-  async countReceivedSince(since: Date): Promise<number> {
-    const r = await this.tx.client.query<{ n: number }>(
-      'select count(*)::int as n from events where user_id = $1 and received_at >= $2',
-      [this.tx.userId, since],
+  /** Events accepted today (UTC day, `YYYY-MM-DD`) — an O(1) counter row, not a count over events. */
+  async usage(day: string): Promise<number> {
+    const r = await this.tx.client.query<{ events: number }>('select events from ingest_usage where user_id = $1 and day = $2', [
+      this.tx.userId,
+      day,
+    ]);
+    return r.rows[0]?.events ?? 0;
+  }
+
+  async addUsage(day: string, n: number) {
+    if (n <= 0) return;
+    await this.tx.client.query(
+      `insert into ingest_usage (user_id, day, events) values ($1, $2, $3)
+       on conflict (user_id, day) do update set events = ingest_usage.events + excluded.events`,
+      [this.tx.userId, day, n],
     );
-    return r.rows[0]?.n ?? 0;
   }
 
   /** Serialize concurrent ingests of one user (quota accounting, batch idempotency). */

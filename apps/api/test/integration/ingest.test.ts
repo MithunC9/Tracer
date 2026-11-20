@@ -110,6 +110,35 @@ describe('ingest', () => {
     expect(done.captureAllowed).toBe(false);
   });
 
+  it('accepts backfilled events inside a backdated window, and late uploads after it closes', async () => {
+    const u = await signup(h.app);
+    const d = await pair(h.app, u.accessToken);
+    const startsAt = new Date(h.clock.now().getTime() - 7 * 24 * 3600_000);
+    const created = await h.app.inject({
+      method: 'POST',
+      url: '/v1/audits',
+      headers: bearer(u.accessToken),
+      payload: { lengthDays: 14, startsAt: startsAt.toISOString() },
+    });
+    expect(created.statusCode).toBe(201);
+    const audit = created.json();
+    const old = eventsFrom(new Date(startsAt.getTime() + 3600_000), 3, 60_000); // six-plus days ago
+    const r1 = IngestResult.parse((await ingest(h.app, d.deviceToken, batchOf(old))).json());
+    expect(r1).toMatchObject({ accepted: 3, captureAllowed: true });
+
+    await h.app.inject({ method: 'POST', url: `/v1/audits/${audit.id}/finish`, headers: bearer(u.accessToken) });
+    h.clock.advance(3600_000); // an hour later the agent comes back online
+    try {
+      const late = eventsFrom(new Date(h.clock.now().getTime() - 2 * 3600_000), 2, 60_000);
+      const afterEnd = focusEvent(new Date(h.clock.now().getTime() - 60_000));
+      const r2 = IngestResult.parse((await ingest(h.app, d.deviceToken, batchOf([...late, afterEnd]))).json());
+      expect(r2).toMatchObject({ accepted: 2, captureAllowed: false });
+      expect(r2.rejected).toEqual([{ id: afterEnd.id, reason: 'outside_window' }]);
+    } finally {
+      h.clock.advance(-3600_000);
+    }
+  });
+
   it('accepts a full 1000-event batch in one request (bulk insert)', async () => {
     const { u, d, audit } = await setup();
     const events = eventsFrom(new Date(Date.parse(audit.startsAt) + 1000), 1000, 50);

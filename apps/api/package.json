@@ -13,7 +13,7 @@
     "migrate": "tsx --env-file-if-exists=../../.env src/scripts/migrate.ts",
     "seed": "tsx --env-file-if-exists=../../.env src/scripts/seed.ts",
     "db:generate": "drizzle-kit generate",
-    "load": "node load/ingest.autocannon.mjs"
+    "load": "k6 run load/ingest.k6.js"
   },
   "dependencies": {
     "@fastify/cookie": "^11.1.5",
@@ -49,7 +49,6 @@
     "@types/pg": "^8.23.1",
     "@types/yauzl": "^3.4.0",
     "@types/yazl": "^3.3.1",
-    "autocannon": "^9.0.0",
     "drizzle-kit": "^0.31.11",
     "testcontainers": "^12.2.2",
     "tsx": "^4.23.15",

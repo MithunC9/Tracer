@@ -18,8 +18,11 @@ export const toAuditDto = (a: AuditRow, reportAvailable: boolean): Audit => ({
   reportAvailable,
 });
 
-/** Accepted lateness for a requested start time (clock skew between browser and server). */
-const START_GRACE_MS = 5 * 60_000;
+/**
+ * How far back a window may start. Backdating lets an agent that buffered offline (or the
+ * simulator's `--time-shift-to-now` backfill) upload events stamped before the audit was created.
+ */
+const MAX_BACKDATE_MS = LIMITS.maxAuditDays * DAY_MS;
 
 /**
  * Capture windows. State machine:
@@ -42,9 +45,12 @@ export class AuditsService {
   async create(actor: Actor, req: CreateAuditRequest): Promise<Audit> {
     const now = this.clock.now();
     const startsAt = req.startsAt ? new Date(req.startsAt) : now;
-    if (startsAt.getTime() < now.getTime() - START_GRACE_MS) throw errors.badRequest('startsAt must not be in the past');
+    if (startsAt.getTime() < now.getTime() - MAX_BACKDATE_MS) throw errors.badRequest(`startsAt must be within the last ${LIMITS.maxAuditDays} days`);
     if (startsAt.getTime() > now.getTime() + 30 * DAY_MS) throw errors.badRequest('startsAt must be within 30 days');
-    const effectiveStart = startsAt < now ? now : startsAt;
+    const effectiveStart = startsAt;
+    if (effectiveStart.getTime() + req.lengthDays * DAY_MS <= now.getTime()) {
+      throw errors.badRequest('The requested window has already ended; choose a later startsAt or more days');
+    }
     return this.uow
       .run(actor.userId, async (r) => {
         const open = await r.audits.findOpen({ forUpdate: true });

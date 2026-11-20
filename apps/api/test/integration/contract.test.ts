@@ -82,6 +82,21 @@ describe('contract', () => {
     expect(evil.headers['access-control-allow-origin']).toBeUndefined();
   });
 
+  it('accepts bodyless POSTs that still declare a JSON content type, rejects malformed JSON', async () => {
+    const empty = await h.app.inject({ method: 'POST', url: '/v1/devices/pairing-codes', headers: { 'content-type': 'application/json' } });
+    expect(empty.statusCode).toBe(401); // reached auth, not a body-parse 400
+    const bad = await h.app.inject({ method: 'POST', url: '/v1/auth/login', headers: { 'content-type': 'application/json' }, payload: '{"email":' });
+    expect(bad.statusCode).toBe(400);
+    expect(bad.json().error.code).toBe('bad_request');
+    const proto = await h.app.inject({
+      method: 'POST',
+      url: '/v1/auth/login',
+      headers: { 'content-type': 'application/json' },
+      payload: '{"__proto__":{"x":1},"email":"a@b.co","password":"x"}',
+    });
+    expect(proto.statusCode).toBe(400);
+  });
+
   it('serves the empty catalog from the CatalogSource port', async () => {
     const res = await h.app.inject({ method: 'GET', url: '/v1/catalog' });
     expect(res.json()).toEqual({ items: [] });

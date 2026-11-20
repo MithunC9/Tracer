@@ -9,6 +9,7 @@ import { sql } from 'drizzle-orm';
 import {
   bigint,
   check,
+  date,
   customType,
   index,
   integer,
@@ -189,6 +190,19 @@ export const events = pgTable(
   ],
 );
 
+/** Deviation: per-user daily ingest counter, so quota checks are O(1) instead of counting events. */
+export const ingestUsage = pgTable(
+  'ingest_usage',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    day: date('day', { mode: 'string' }).notNull(),
+    events: integer('events').notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.day] })],
+);
+
 export const pipelineRuns = pgTable(
   'pipeline_runs',
   {
@@ -313,6 +327,7 @@ export const TENANT_TABLES_DELETE_ORDER = [
   'pipeline_runs',
   'events',
   'ingest_batches',
+  'ingest_usage',
   'exclusions',
   'audits',
   'devices',

@@ -12,6 +12,8 @@ import { loadExclusions } from './pipeline.js';
 
 /** Tolerated device clock skew for event timestamps. */
 const SKEW_MS = 5 * 60_000;
+/** How long after a window closes events stamped inside it are still accepted. */
+export const LATE_UPLOAD_GRACE_MS = 24 * 3600_000;
 
 export type RejectReason =
   | 'no_open_audit'
@@ -65,14 +67,20 @@ export class IngestService {
 
       const now = this.clock.now();
       const dayStart = new Date(Math.floor(now.getTime() / DAY_MS) * DAY_MS);
-      const usedToday = await r.events.countReceivedSince(dayStart);
+      const day = dayStart.toISOString().slice(0, 10);
+      const usedToday = await r.events.usage(day);
       if (usedToday >= this.opts.dailyQuota) {
         throw errors.quotaExceeded('Daily event quota exhausted', (dayStart.getTime() + DAY_MS - now.getTime()) / 1000);
       }
 
       let audit = await r.audits.findOpen({ forUpdate: true });
       if (audit) audit = await this.audits.reconcile(r, audit);
-      const open = audit && ['capturing', 'paused', 'scheduled'].includes(audit.status) ? audit : null;
+      // Late uploads: an agent that was offline flushes its buffer after the window closed.
+      // Events stamped inside a recently closed window are still accepted (captureAllowed=false);
+      // they are picked up by the next pipeline run (POST /pipeline re-runs cheaply).
+      const open =
+        (audit && ['capturing', 'paused', 'scheduled'].includes(audit.status) ? audit : null) ??
+        (await r.audits.findRecentlyClosed(new Date(now.getTime() - LATE_UPLOAD_GRACE_MS)));
       const exclusions = await loadExclusions(r);
       const dek = await this.keys.get(r);
 
@@ -103,6 +111,7 @@ export class IngestService {
         });
       }
       const inserted = await r.events.insertEvents(rows, now);
+      await r.events.addUsage(day, inserted);
       const res: IngestResult = {
         batchId: batch.batchId,
         accepted: inserted,

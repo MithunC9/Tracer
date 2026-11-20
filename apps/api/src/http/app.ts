@@ -43,6 +43,16 @@ export async function buildApp(c: Container, opts: { handlers?: Partial<Handlers
   app.setNotFoundHandler(notFoundHandler);
   app.decorateRequest('actor', null);
 
+  // Bodyless POSTs (pause, finish, pairing-codes...) are often sent with a JSON content type;
+  // treat an empty body as "no body" instead of a 400. Non-empty bodies keep Fastify's
+  // prototype-poisoning-safe parser.
+  const defaultJson = app.getDefaultJsonParser('error', 'error');
+  app.removeContentTypeParser('application/json');
+  app.addContentTypeParser('application/json', { parseAs: 'string' }, (req, body, done) => {
+    if (body === '' || body === undefined) return done(null, undefined);
+    defaultJson(req, body as string, done);
+  });
+
   app.addHook('onRequest', async (req, reply) => {
     reply.header('x-request-id', req.id);
   });

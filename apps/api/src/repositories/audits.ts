@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray } from 'drizzle-orm';
 import type { AuditStatus } from '@tracer/schema';
 import { audits, exclusions, reports } from '../db/schema.js';
 import type { Tx } from '../db/database.js';
@@ -34,6 +34,17 @@ export class AuditsRepo {
       .from(audits)
       .where(and(eq(audits.userId, this.tx.userId), inArray(audits.status, OPEN_STATUSES)));
     const [a] = opts.forUpdate ? await q.for('update') : await q;
+    return a ?? null;
+  }
+
+  /** Most recent window that closed after `since` (for late uploads). */
+  async findRecentlyClosed(since: Date): Promise<AuditRow | null> {
+    const [a] = await this.tx.db
+      .select()
+      .from(audits)
+      .where(and(eq(audits.userId, this.tx.userId), inArray(audits.status, ['analyzing', 'complete', 'failed']), gte(audits.endsAt, since)))
+      .orderBy(desc(audits.endsAt))
+      .limit(1);
     return a ?? null;
   }
 

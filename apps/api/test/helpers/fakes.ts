@@ -22,6 +22,7 @@ export class FakeStore {
   events: (EventInsertRow & { userId: string; receivedAt: Date })[] = [];
   accessLog: { userId: string; actor: string; actorId: string | null; action: string; resource: string; requestId: string | null; at: Date }[] = [];
   jobs: PipelineJob[] = [];
+  usage = new Map<string, number>();
   runs: { id: string; userId: string; auditId: string; state: string }[] = [];
 
   /** Row-level copy (Buffers shared, they are never mutated). */
@@ -133,6 +134,12 @@ export function fakeRepos(store: FakeStore, userId: string): Repos {
         return { ...a };
       },
       withReports: async () => new Set<string>(),
+      findRecentlyClosed: async (since: Date) => {
+        const a = mine(store.audits)
+          .filter((x) => ['analyzing', 'complete', 'failed'].includes(x.status) && x.endsAt >= since)
+          .sort((x, y) => y.endsAt.getTime() - x.endsAt.getTime())[0];
+        return a ? { ...a } : null;
+      },
     },
     exclusions: {
       get: async () => store.exclusions.get(userId) ?? null,
@@ -154,7 +161,8 @@ export function fakeRepos(store: FakeStore, userId: string): Repos {
         }
         return n;
       },
-      countReceivedSince: async (since: Date) => mine(store.events).filter((e) => e.receivedAt >= since).length,
+      usage: async (day: string) => store.usage.get(`${userId}:${day}`) ?? 0,
+      addUsage: async (day: string, n: number) => void store.usage.set(`${userId}:${day}`, (store.usage.get(`${userId}:${day}`) ?? 0) + n),
     },
     pipeline: {
       createRun: async (auditId: string) => {

@@ -87,10 +87,12 @@ describe('AuditsService state machine', () => {
     expect((await w.audits.get(actor, a.id)).status).toBe('capturing');
   });
 
-  it('rejects start times in the past', async () => {
-    await expect(
-      w.audits.create(actor, { lengthDays: 2, startsAt: new Date(w.clock.now().getTime() - 3600_000).toISOString(), recurrence: 'none' }),
-    ).rejects.toMatchObject({ code: 'bad_request' });
+  it('allows backdated windows (offline buffers, simulator backfill) but not ones already over', async () => {
+    const past = (days: number) => new Date(w.clock.now().getTime() - days * DAY_MS).toISOString();
+    await expect(w.audits.create(actor, { lengthDays: 14, startsAt: past(15), recurrence: 'none' })).rejects.toMatchObject({ code: 'bad_request' });
+    await expect(w.audits.create(actor, { lengthDays: 3, startsAt: past(7), recurrence: 'none' })).rejects.toMatchObject({ code: 'bad_request' });
+    const a = await w.audits.create(actor, { lengthDays: 14, startsAt: past(7), recurrence: 'none' });
+    expect(a).toMatchObject({ status: 'capturing', startsAt: past(7) });
   });
 
   it('pause/resume accumulates paused time; invalid transitions conflict', async () => {
