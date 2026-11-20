@@ -23,6 +23,17 @@ export default defineConfig({
           hookTimeout: 120_000,
         },
       },
+      {
+        test: {
+          name: 'e2e',
+          include: ['test/e2e/**/*.test.ts'],
+          environment: 'node',
+          // Same database setup; uses tracer-sim when built (TRACER_SIM_BIN or the cargo release build).
+          globalSetup: ['test/helpers/global-setup.ts'],
+          testTimeout: 180_000,
+          hookTimeout: 120_000,
+        },
+      },
     ],
   },
 });
