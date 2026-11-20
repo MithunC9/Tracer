@@ -1,0 +1,52 @@
+[package]
+name = "tracer-core"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+description = "Tracer agent core: capture trait, on-device exclusion + redaction, encrypted buffer, uploader, simulator."
+license = "UNLICENSED"
+publish = false
+
+# Standalone crate (not part of a parent workspace) so `cargo test --manifest-path` works
+# from anywhere and the Tauri shell can depend on it by path.
+[workspace]
+
+[lib]
+name = "tracer_core"
+path = "src/lib.rs"
+
+[[bin]]
+name = "tracer-sim"
+path = "src/bin/tracer-sim.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+regex = "1"
+url = "2"
+uuid = { version = "1", features = ["v4", "v7", "serde"] }
+sha2 = "0.10"
+hex = "0.4"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std", "serde"] }
+rusqlite = { version = "0.32", features = ["bundled"] }
+aes-gcm = "0.10"
+rand = "0.8"
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+clap = { version = "4", features = ["derive"] }
+thiserror = "2"
+log = "0.4"
+env_logger = { version = "0.11", default-features = false, features = ["auto-color", "humantime"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+keyring = { version = "3", features = ["apple-native"] }
+objc2 = "0.6"
+objc2-foundation = { version = "0.3", features = ["NSString", "NSArray"] }
+objc2-app-kit = { version = "0.3", features = ["NSWorkspace", "NSRunningApplication", "NSPasteboard"] }
+core-foundation = "0.10"
+
+[dev-dependencies]
+tempfile = "3"
+jsonschema = { version = "0.26", default-features = false }
+
+[profile.dev.package."*"]
+opt-level = 1
