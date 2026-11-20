@@ -136,7 +136,9 @@ function scoreEntry(req: ClusterRequirements, e: CatalogEntry, c: UserConstraint
     delta: round1(W.capability * cov.share),
     note:
       cov.missing.length === 0
-        ? `Covers all ${needed.length} needed capabilities`
+        ? needed.length === 1
+          ? 'Covers the needed capability'
+          : `Covers all ${needed.length} needed capabilities`
         : `Covers ${cov.covered.length} of ${needed.length} needed capabilities (missing: ${cov.missing.join(', ')})`,
   });
 
